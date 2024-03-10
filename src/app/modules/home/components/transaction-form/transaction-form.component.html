@@ -1,0 +1,123 @@
+<form
+  [formGroup]="form"
+  novalidate
+  (ngSubmit)="onSubmit($event)"
+  autocomplete="off"
+>
+  <div class="mb-5 relative">
+    <input
+      type="text"
+      placeholder="Ingresa una descripción"
+      formControlName="description"
+      class="bg-zinc-600 text-zinc-100 py-3 px-2 rounded-lg block mb-2 w-full"
+    />
+    <ng-container *ngIf="descriptionField?.touched && descriptionField?.errors">
+      <div class="text-red-500 px-2 py-1 rounded absolute top-10 left-0">
+        <span
+          class="block sm:inline"
+          *ngIf="descriptionField?.hasError('required')"
+          >Este campo es requerido</span
+        >
+      </div>
+    </ng-container>
+  </div>
+  <div class="mb-5 relative">
+    <input
+      type="number"
+      placeholder="0.0"
+      formControlName="amount"
+      class="bg-zinc-600 text-zinc-100 py-3 px-2 rounded-lg block mb-2 w-full"
+    />
+    <ng-container *ngIf="amountField?.touched && amountField?.errors">
+      <div class="text-red-500 px-2 py-1 rounded absolute top-10 left-0">
+        <span class="block sm:inline" *ngIf="amountField?.hasError('required')"
+          >Este campo es requerido</span
+        >
+        <span *ngIf="amountField?.hasError('min')"
+          >Este campo debe ser mayor a 0</span
+        >
+      </div>
+    </ng-container>
+  </div>
+
+  <div class="mb-5 relative">
+    <h3 class="font-semibold">Tipo de transacción</h3>
+    <div class="flex justify-evenly sm:flex-row flex-col">
+      <label
+        for="transactionType"
+        class="inline-flex px-2 py-1.5 items-center justify-center rounded my-3 mx-1 hover:cursor-pointer"
+        [ngClass]="{
+          'bg-gray-400': transactionTypeField?.value !== 'income',
+          'bg-green-500': transactionTypeField?.value === 'income'
+        }"
+        (click)="transactionTypeField?.setValue('income')"
+      >
+        <input
+          class="appearance-none"
+          type="radio"
+          name="transactionType"
+          value="income"
+          formControlName="transactionType"
+        />
+        <span>Ingreso</span>
+      </label>
+      <label
+        for="transactionType"
+        class="inline-flex px-2 py-1.5 items-center justify-center rounded my-3 mx-1 hover:cursor-pointer"
+        [ngClass]="{
+          'bg-gray-400': transactionTypeField?.value !== 'expense_necessary',
+          'bg-amber-500': transactionTypeField?.value === 'expense_necessary'
+        }"
+        (click)="transactionTypeField?.setValue('expense_necessary')"
+      >
+        <input
+          class="appearance-none"
+          type="radio"
+          name="transactionType"
+          value="expense_necessary"
+          formControlName="transactionType"
+        />
+        <span>Gasto Necesario</span>
+      </label>
+      <label
+        for="transactionType"
+        class="inline-flex px-2 py-1.5 items-center justify-center rounded my-3 mx-1 hover:cursor-pointer"
+        [ngClass]="{
+          'bg-gray-400': transactionTypeField?.value !== 'expense_unnecessary',
+          'bg-red-500': transactionTypeField?.value === 'expense_unnecessary'
+        }"
+        (click)="transactionTypeField?.setValue('expense_unnecessary')"
+      >
+        <input
+          class="appearance-none"
+          type="radio"
+          name="transactionType"
+          value="expense_unnecessary"
+          formControlName="transactionType"
+        />
+        <span>Gasto Innecesario</span>
+      </label>
+    </div>
+    <ng-container
+      *ngIf="transactionTypeField?.touched && transactionTypeField?.errors"
+    >
+      <div class="text-red-500 px-2 py-1 rounded absolute top-16 left-0">
+        <span
+          class="block sm:inline"
+          *ngIf="transactionTypeField?.hasError('required')"
+          >Este campo es requerido</span
+        >
+      </div>
+    </ng-container>
+  </div>
+  <button
+    type="submit"
+    class="bg-indigo-700 transition ease-in-out delay-75 text-zinc-100 px-3 py-2 rounded-lg block w-full"
+    [ngClass]="{
+      'hover:bg-indigo-600': form.valid,
+      'hover:cursor-not-allowed': form.invalid
+    }"
+  >
+    Añade una transacción
+  </button>
+</form>

@@ -1,0 +1,128 @@
+<div class="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="text-center">
+      <h2 class="text-3xl font-extrabold text-zinc-100">
+        Inicia sesión en tu cuenta
+      </h2>
+    </div>
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+      <div class="bg-zinc-800 py-8 px-4 shadow sm:rounded-lg sm:px-10">
+        <form
+          class="flex flex-col justify-between items-center w-full"
+          [formGroup]="form"
+          novalidate
+          (ngSubmit)="onSubmit($event)"
+          autocomplete="off"
+        >
+          <div class="w-full mb-5 relative">
+            <label class="font-semibold text-zinc-100">
+              Nombre <span class="text-red-500">*</span>
+            </label>
+
+            <input
+              class="bg-zinc-600 text-zinc-100 px-3 py-2 rounded-lg block mb-2 w-full"
+              type="text"
+              formControlName="name"
+              placeholder="Nombre"
+              autofocus
+            />
+            <ng-container *ngIf="nameField?.touched && nameField?.errors">
+              <div
+                class="text-red-500 px-2 py-1 rounded absolute top-16 left-0"
+              >
+                <span
+                  class="block sm:inline"
+                  *ngIf="nameField?.hasError('required')"
+                  >Este campo es requerido</span
+                >
+              </div>
+            </ng-container>
+          </div>
+          <div class="w-full mb-5 relative">
+            <label class="font-semibold text-zinc-100">
+              Email <span class="text-red-500">*</span>
+            </label>
+
+            <input
+              class="bg-zinc-600 text-zinc-100 px-3 py-2 rounded-lg block mb-2 w-full"
+              type="text"
+              formControlName="email"
+              placeholder="Email"
+            />
+            <ng-container *ngIf="emailField?.touched && emailField?.errors">
+              <div
+                class="text-red-500 px-2 py-1 rounded absolute top-16 left-0"
+              >
+                <span
+                  class="block sm:inline"
+                  *ngIf="emailField?.hasError('required')"
+                  >Este campo es requerido</span
+                >
+                <span
+                  class="block sm:inline"
+                  *ngIf="emailField?.hasError('email')"
+                  >Este campo debe tener el formato de un email</span
+                >
+              </div>
+            </ng-container>
+          </div>
+          <div class="w-full mb-5 relative">
+            <label class="font-semibold text-zinc-100">
+              Contraseña <span class="text-red-500">*</span>
+            </label>
+            <input
+              class="bg-zinc-600 text-zinc-100 px-3 py-2 rounded-lg block mb-2 w-full"
+              type="password"
+              formControlName="password"
+              placeholder="Contraseña"
+            />
+            <ng-container
+              *ngIf="passwordField?.touched && passwordField?.errors"
+            >
+              <div
+                class="text-red-500 px-2 py-1 rounded absolute top-16 left-0"
+              >
+                <span
+                  class="block sm:inline"
+                  *ngIf="passwordField?.hasError('required')"
+                  >Este campo es requerido
+                </span>
+                <span
+                  class="block sm:inline"
+                  *ngIf="passwordField?.hasError('minlength')"
+                  >Este campo debe tener al menos 8 caracteres</span
+                >
+              </div>
+            </ng-container>
+          </div>
+          <div class="w-full mt-2">
+            <button
+              class="bg-indigo-700 transition ease-in-out delay-75 text-zinc-100 px-3 py-2 rounded-lg block mb-5 w-full"
+              [ngClass]="{
+                'hover:bg-indigo-600': form.valid,
+                'hover:cursor-not-allowed': form.invalid
+              }"
+              type="submit"
+            >
+              Iniciar Sesión
+            </button>
+            <p class="text-zinc-100 text-center">
+              ¿Ya tienes una cuenta?
+              <a
+                routerLink="/login"
+                class="text-indigo-700 hover:text-indigo-600 transition ease-in-out delay-75"
+                >¡Logueate aquí!</a
+              >
+            </p>
+            <p
+              *ngIf="errorMessage"
+              class="text-zinc-100 bg-red-400 border rounded p-2 block"
+            >
+              {{ errorMessage }}
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
