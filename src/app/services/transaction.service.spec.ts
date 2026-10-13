@@ -44,7 +44,23 @@ describe('TransactionService', () => {
     const req = http.expectOne((r) => r.url === URL);
     expect(req.request.params.get('type')).toBe('income');
     expect(req.request.params.has('search')).toBeFalse();
-    expect(req.request.params.get('from')).toBe('2026-10-01');
+    expect(req.request.params.get('from')).toBe(new Date(2026, 9, 1).toISOString());
+  });
+
+  it('envía from/to como instantes ISO del día local (to exclusivo = inicio del día siguiente)', () => {
+    service.transactions$.subscribe();
+    http.expectOne(URL).flush([]);
+    service.setFilters({ from: '2026-10-01', to: '2026-10-31' });
+    const req = http.expectOne((r) => r.url === URL);
+    expect(req.request.params.get('from')).toBe(new Date(2026, 9, 1, 0, 0, 0, 0).toISOString());
+    expect(req.request.params.get('to')).toBe(new Date(2026, 10, 1, 0, 0, 0, 0).toISOString());
+  });
+
+  it('mantiene from/to de los filtros como días locales YYYY-MM-DD', () => {
+    let current = {};
+    service.filters$.subscribe((f) => (current = f));
+    service.setFilters({ from: '2026-10-01', to: '2026-10-13' });
+    expect(current).toEqual({ from: '2026-10-01', to: '2026-10-13' });
   });
 
   it('cancela la petición anterior al cambiar filtros (switchMap)', () => {

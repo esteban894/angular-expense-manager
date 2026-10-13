@@ -12,7 +12,7 @@ Gestor de gastos personales que te ayuda a ver a dónde se va tu dinero: separa 
 
 - Saldo, ingresos y gastos, con desglose necesario / innecesario y proyección "si evitaras los gastos innecesarios".
 - Alta de transacciones con tres tipos (ingreso, gasto necesario, gasto innecesario) y validación de montos en formato `1.234,50`.
-- Historial con filtros por tipo (chips), búsqueda por descripción con debounce y rango de fechas, todo resuelto en el backend.
+- Historial con filtros por tipo (chips), búsqueda por descripción con debounce y rango de fechas, todo resuelto en el backend. Las fechas se eligen como días locales y se envían a la API como instantes ISO: `from` = 00:00 local del día "Desde" (inclusivo) y `to` = 00:00 local del día siguiente al "Hasta" (exclusivo), así el filtro respeta tu zona horaria aunque la base guarde en UTC.
 - Eliminar con **deshacer** (borrado lógico y endpoint de restauración).
 - Tema claro, oscuro o del sistema; diseño responsive.
 - Login y registro, más una cuenta demo de un clic.

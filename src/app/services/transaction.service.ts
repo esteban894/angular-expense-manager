@@ -33,12 +33,22 @@ function clean(f: TransactionFilters): TransactionFilters {
   return out as TransactionFilters;
 }
 
+/** Inicio del día local `key` (YYYY-MM-DD) desplazado `offsetDays`, como instante ISO (UTC). */
+function localDayStartIso(key: string, offsetDays = 0): string {
+  const [y, m, d] = key.split('-').map(Number);
+  return new Date(y, m - 1, d + offsetDays).toISOString();
+}
+
 function toParams(f: TransactionFilters): HttpParams {
   let params = new HttpParams();
   const c = clean(f);
   for (const key of FILTER_KEYS) {
     const value = c[key];
-    if (value) params = params.set(key, value);
+    if (!value) continue;
+    // La API compara instantes: from inclusivo (00:00 local), to exclusivo (00:00 local del día siguiente).
+    const sent =
+      key === 'from' ? localDayStartIso(value) : key === 'to' ? localDayStartIso(value, 1) : value;
+    params = params.set(key, sent);
   }
   return params;
 }

@@ -16,9 +16,9 @@ export interface Transaction {
 export interface TransactionFilters {
   type?: TypeAmount;
   search?: string;
-  /** YYYY-MM-DD, inclusive. */
+  /** Día local YYYY-MM-DD, inclusivo (se envía como 00:00 local en ISO). */
   from?: string;
-  /** YYYY-MM-DD, inclusive. */
+  /** Día local YYYY-MM-DD, inclusivo (se envía como 00:00 local del día siguiente, exclusivo). */
   to?: string;
 }
 
