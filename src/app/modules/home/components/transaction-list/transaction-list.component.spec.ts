@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject, of, throwError } from 'rxjs';
+import { ToastService } from 'src/app/services/toast.service';
 import { Transaction, TransactionFilters, TypeAmount } from 'src/app/models/transaction.model';
 import { TransactionService } from 'src/app/services/transaction.service';
 import { TransactionListComponent } from './transaction-list.component';
@@ -20,6 +21,7 @@ const tx = (id: number): Transaction => ({
 describe('TransactionListComponent', () => {
   let fixture: ComponentFixture<TransactionListComponent>;
   let service: any;
+  let toast: any;
   const el = () => fixture.nativeElement as HTMLElement;
   const btn = (label: string) =>
     Array.from(el().querySelectorAll('button')).find((b) => b.textContent!.includes(label)) as HTMLButtonElement;
@@ -33,10 +35,15 @@ describe('TransactionListComponent', () => {
       clearFilters: jasmine.createSpy('clearFilters'),
       reload: jasmine.createSpy('reload'),
       remove: jasmine.createSpy('remove').and.returnValue(of(undefined)),
+      restore: jasmine.createSpy('restore').and.returnValue(of(tx(5))),
     };
+    toast = { show: jasmine.createSpy('show') };
     TestBed.configureTestingModule({
       declarations: [TransactionListComponent, FiltersStub, ItemStub],
-      providers: [{ provide: TransactionService, useValue: service }],
+      providers: [
+        { provide: TransactionService, useValue: service },
+        { provide: ToastService, useValue: toast },
+      ],
     });
     fixture = TestBed.createComponent(TransactionListComponent);
     fixture.detectChanges();
@@ -83,5 +90,30 @@ describe('TransactionListComponent', () => {
     setup({ list: [tx(5)] });
     (el().querySelector('app-transaction-item button') as HTMLButtonElement).click();
     expect(service.remove).toHaveBeenCalledWith(5);
+  });
+
+  const del = () => (el().querySelector('app-transaction-item button') as HTMLButtonElement).click();
+
+  it('tras eliminar muestra toast con Deshacer que restaura', () => {
+    setup({ list: [{ ...tx(5), description: 'Alquiler' }] });
+    del();
+    expect(toast.show).toHaveBeenCalledWith('Se eliminó "Alquiler"', jasmine.objectContaining({ label: 'Deshacer' }));
+    toast.show.calls.mostRecent().args[1].run();
+    expect(service.restore).toHaveBeenCalledWith(5);
+  });
+
+  it('si restore falla avisa', () => {
+    setup({ list: [tx(5)] });
+    service.restore.and.returnValue(throwError(() => new Error('x')));
+    del();
+    toast.show.calls.mostRecent().args[1].run();
+    expect(toast.show).toHaveBeenCalledWith('No pudimos restaurar la transacción');
+  });
+
+  it('si remove falla avisa', () => {
+    setup({ list: [tx(5)] });
+    service.remove.and.returnValue(throwError(() => new Error('x')));
+    del();
+    expect(toast.show).toHaveBeenCalledWith('No pudimos eliminar la transacción. Intenta de nuevo.');
   });
 });

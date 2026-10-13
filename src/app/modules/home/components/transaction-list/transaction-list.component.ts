@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Transaction, TransactionFilters } from 'src/app/models/transaction.model';
+import { ToastService } from 'src/app/services/toast.service';
 import { TransactionService } from 'src/app/services/transaction.service';
 
 @Component({
@@ -13,7 +14,9 @@ export class TransactionListComponent {
   filters$ = this.transactionService.filters$;
   skeletons = [0, 1, 2, 3];
 
-  constructor(private transactionService: TransactionService) {}
+  constructor(private transactionService: TransactionService,
+    private toast: ToastService,
+  ) {}
 
   trackById(_: number, t: Transaction): number {
     return t.id;
@@ -31,8 +34,17 @@ export class TransactionListComponent {
     this.transactionService.reload();
   }
 
-  // Seam para Task 12: aquí se agregará el toast de deshacer.
   onDelete(t: Transaction): void {
-    this.transactionService.remove(t.id).subscribe();
+    this.transactionService.remove(t.id).subscribe({
+      next: () =>
+        this.toast.show(`Se eliminó "${t.description}"`, {
+          label: 'Deshacer',
+          run: () =>
+            this.transactionService
+              .restore(t.id)
+              .subscribe({ error: () => this.toast.show('No pudimos restaurar la transacción') }),
+        }),
+      error: () => this.toast.show('No pudimos eliminar la transacción. Intenta de nuevo.'),
+    });
   }
 }
