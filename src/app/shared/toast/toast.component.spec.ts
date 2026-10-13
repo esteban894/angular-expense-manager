@@ -52,4 +52,19 @@ describe('ToastComponent', () => {
     fixture.detectChanges();
     expect(el().querySelector('[role=status]')!.textContent).toContain('Dos');
   });
+
+  it('pausa con hover o foco y reanuda solo cuando ambos terminan', () => {
+    const pause = spyOn(service, 'pause').and.callThrough();
+    const resume = spyOn(service, 'resume').and.callThrough();
+    service.show('Listo', { label: 'Deshacer', run: () => {} });
+    fixture.detectChanges();
+    const box = el().querySelector('[data-testid=toast]') as HTMLElement;
+    box.dispatchEvent(new MouseEvent('mouseenter'));
+    expect(pause).toHaveBeenCalledTimes(1);
+    box.querySelector('button')!.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    box.dispatchEvent(new MouseEvent('mouseleave'));
+    expect(resume).not.toHaveBeenCalled();
+    box.querySelector('button')!.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
+    expect(resume).toHaveBeenCalledTimes(1);
+  });
 });
