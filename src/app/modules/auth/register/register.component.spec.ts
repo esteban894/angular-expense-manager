@@ -92,4 +92,12 @@ describe('RegisterComponent', () => {
     (q('#demo-login') as HTMLButtonElement).click();
     expect(auth.login).toHaveBeenCalledWith(environment.demo.email, environment.demo.password);
   });
+
+  it('cuenta demo con 401 usa el mensaje de login', () => {
+    setup();
+    auth.login.and.returnValue(throwError(() => new HttpErrorResponse({ status: 401 })));
+    (q('#demo-login') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(norm(q('[role="alert"]')!.textContent!)).toBe('Email o contraseña incorrectos.');
+  });
 });
