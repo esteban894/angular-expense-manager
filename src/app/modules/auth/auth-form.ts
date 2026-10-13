@@ -29,5 +29,6 @@ export function apiErrorMessage(err: unknown, mode: 'login' | 'register'): strin
   if (mode === 'login' && e?.status === 401) return 'Email o contraseña incorrectos.';
   if (mode === 'register' && e?.status === 400 && e.error?.message === 'User already exists')
     return 'Ya existe una cuenta con ese email.';
+  if (e?.status === 400) return 'Revisa los datos ingresados.';
   return 'No pudimos conectar con el servidor. Intenta de nuevo.';
 }
