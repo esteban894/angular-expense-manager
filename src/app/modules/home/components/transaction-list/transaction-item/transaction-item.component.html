@@ -1,8 +1,8 @@
 <li
-  class="group grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 rounded-[10px] px-2 py-2.5 hover:bg-surface-2"
+  class="group grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 max-[480px]:grid-cols-[minmax(0,1fr)_auto_auto] max-[480px]:gap-2 rounded-[10px] px-2 py-2.5 hover:bg-surface-2"
 >
   <span
-    class="grid h-9 w-9 flex-none place-items-center rounded-[10px]"
+    class="grid h-9 w-9 flex-none place-items-center rounded-[10px] max-[480px]:hidden"
     [ngClass]="{
       'bg-inc-soft text-inc': meta.cls === 'inc',
       'bg-nec-soft text-nec': meta.cls === 'nec',
@@ -18,11 +18,11 @@
     <div data-testid="desc" class="truncate font-medium text-fg" [title]="transaction.description">
       {{ transaction.description }}
     </div>
-    <div data-testid="sub" class="text-xs text-muted">{{ meta.label }} · {{ transaction.createdAt | date : 'd MMM' }}</div>
+    <div data-testid="sub" class="truncate text-xs text-muted">{{ meta.label }} · {{ transaction.createdAt | date : 'd MMM' }}</div>
   </div>
   <span
     data-testid="amount"
-    class="font-num text-right font-medium tabular-nums"
+    class="font-num text-right font-medium tabular-nums max-[480px]:text-sm"
     [ngClass]="transaction.amount > 0 ? 'text-inc' : 'text-fg'"
     >{{ formatCents(transaction.amount, { signed: true }) }}</span
   >

@@ -93,7 +93,7 @@ export class TransactionFormComponent {
   }
 
   showError(c: AbstractControl): boolean {
-    return c.invalid && (c.touched || this.submitted);
+    return c.invalid && ((c.touched && c.dirty) || this.submitted);
   }
 
   onSubmit(event?: Event) {

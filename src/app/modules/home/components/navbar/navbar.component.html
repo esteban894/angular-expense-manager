@@ -3,7 +3,7 @@
   class="sticky top-0 z-[5] bg-bg/90 backdrop-blur-sm border-b border-line"
 >
   <div class="max-w-[1120px] mx-auto px-4 py-3 flex items-center justify-between gap-3">
-    <div class="flex items-center gap-2.5 font-display font-bold text-lg tracking-[-.02em] text-fg">
+    <div class="flex items-center gap-2.5 whitespace-nowrap font-display font-bold text-lg tracking-[-.02em] text-fg">
       <span class="w-7 h-7 rounded-lg bg-accent grid place-items-center">
         <svg class="w-4 h-4" viewBox="0 0 16 16" fill="none" aria-hidden="true">
           <rect x="2" y="3" width="12" height="3" rx="1.5" class="fill-bg" />
@@ -16,20 +16,21 @@
       <button
         type="button"
         data-testid="theme-toggle"
-        class="border border-line text-muted hover:text-fg hover:border-muted rounded-lg px-3 py-[7px] text-[13px]"
+        [attr.aria-label]="'Tema: ' + modeLabel(theme.mode$ | async)"
+        class="border border-line text-muted hover:text-fg hover:border-muted rounded-lg px-3 py-[7px] text-[13px] whitespace-nowrap"
         (click)="theme.cycle()"
       >
-        Tema: {{ modeLabel(theme.mode$ | async) }}
+        <span class="max-[480px]:hidden">Tema: </span>{{ modeLabel(theme.mode$ | async) }}
       </button>
       <span
-        class="w-8 h-8 rounded-full bg-accent-soft text-accent grid place-items-center font-semibold text-[13px] shrink-0"
+        class="w-8 h-8 rounded-full max-[480px]:hidden bg-accent-soft text-accent grid place-items-center font-semibold text-[13px] shrink-0"
         aria-hidden="true"
         >{{ initials }}</span
       >
       <span class="text-muted truncate max-[480px]:hidden">{{ userEmail }}</span>
       <button
         type="button"
-        class="border border-line text-fg hover:border-muted rounded-lg px-3 py-[7px] text-[13px] font-semibold"
+        class="border border-line text-fg hover:border-muted rounded-lg px-3 py-[7px] text-[13px] font-semibold whitespace-nowrap"
         (click)="logOut()"
       >
         Cerrar sesión
