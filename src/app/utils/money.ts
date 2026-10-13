@@ -19,7 +19,7 @@ export function parseMoneyToCents(input: string): number | null {
 }
 
 export function formatCents(cents: number, opts: { signed?: boolean } = {}): string {
-  const text = fmt.format(Math.abs(cents) / 100).replace(/[  ]/g, ' ');
+  const text = fmt.format(Math.abs(cents) / 100).replace(/\s/g, ' ');
   if (!opts.signed) return cents < 0 ? `− ${text}` : text;
   return `${cents < 0 ? '−' : '+'} ${text}`;
 }
