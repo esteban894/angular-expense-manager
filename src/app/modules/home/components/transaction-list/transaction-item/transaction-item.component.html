@@ -6,7 +6,7 @@
     }}<span *ngIf="transaction.description.length > 35">...</span>
   </p>
   <div>
-    <span>${{ transaction.amount }}</span>
+    <span>{{ formatCents(transaction.amount) }}</span>
     <button
       (click)="deleteTransaction(transaction.id)"
       class="bg-indigo-700 text-zinc-100 px-2 rounded-md ml-2 transition ease-in-out delay-75 hover:bg-indigo-600"

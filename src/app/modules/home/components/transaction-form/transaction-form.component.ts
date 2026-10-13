@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TypeAmount } from 'src/app/models/transaction.model';
+import { parseMoneyToCents } from 'src/app/utils/money';
 import { TransactionService } from 'src/app/services/transaction.service';
 
 @Component({
@@ -26,22 +27,20 @@ export class TransactionFormComponent {
     event.preventDefault();
 
     if (this.form.valid) {
-      let updatedAmount = +this.amountField!.value;
-
-      if (
-        this.transactionTypeField?.value === 'expense_necessary' ||
-        this.transactionTypeField?.value === 'expense_unnecessary'
-      ) {
-        updatedAmount *= -1;
+      const cents = parseMoneyToCents(String(this.amountField!.value));
+      if (cents === null) {
+        this.amountField!.setErrors({ min: true });
+        this.form.markAllAsTouched();
+        return;
       }
 
-      const transaction = {
-        amount: updatedAmount,
-        typeAmount: this.transactionTypeField?.value as TypeAmount,
-        description: this.descriptionField?.value as string,
-      };
-
-      this.transactionService.addTransaction(transaction);
+      this.transactionService
+        .add({
+          amount: cents,
+          typeAmount: this.transactionTypeField?.value as TypeAmount,
+          description: this.descriptionField?.value as string,
+        })
+        .subscribe();
 
       this.form.reset();
     } else {

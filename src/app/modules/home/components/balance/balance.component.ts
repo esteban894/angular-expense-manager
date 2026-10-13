@@ -1,30 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { Transaction } from 'src/app/models/transaction.model';
+import { Component } from '@angular/core';
+import { map } from 'rxjs';
 import { TransactionService } from 'src/app/services/transaction.service';
+import { formatCents } from 'src/app/utils/money';
 
 @Component({
   selector: 'app-balance',
   templateUrl: './balance.component.html',
   styles: [``],
 })
-export class BalanceComponent implements OnInit {
-  transactions: Transaction[] = [];
-  amounts: any[] = [];
-  total: any;
+export class BalanceComponent {
+  total$ = this.transactionService.summary$.pipe(
+    map((s) => formatCents(s.balance))
+  );
 
   constructor(private transactionService: TransactionService) {}
-
-  ngOnInit(): void {
-    this.transactionService.state$.subscribe((data: any) => {
-      this.transactions = data.transactions;
-
-      this.amounts = this.transactions.map(
-        (transaction: any) => transaction.amount
-      );
-
-      this.total = this.amounts
-        .reduce((acc, item) => (acc += item), 0)
-        .toFixed(2);
-    });
-  }
 }
