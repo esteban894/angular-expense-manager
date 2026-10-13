@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
-import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SummaryCardComponent } from './components/summary-card/summary-card.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
@@ -26,7 +25,6 @@ import { HomeComponent } from './pages/home.component';
     CommonModule,
     HomeRoutingModule,
     ReactiveFormsModule,
-    HttpClientModule,
   ],
   exports: [NavbarComponent],
 })

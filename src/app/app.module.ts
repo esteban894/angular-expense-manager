@@ -7,7 +7,6 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeModule } from './modules/home/home.module';
-import { NavbarComponent } from './modules/home/components/navbar/navbar.component';
 import { TokenInterceptor } from './interceptors/token.interceptor';
 import { ToastComponent } from './shared/toast/toast.component';
 
