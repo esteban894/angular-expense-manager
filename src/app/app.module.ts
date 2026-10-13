@@ -1,4 +1,6 @@
-import { NgModule } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeEsAr from '@angular/common/locales/es-AR';
+import { LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
@@ -8,10 +10,13 @@ import { HomeModule } from './modules/home/home.module';
 import { NavbarComponent } from './modules/home/components/navbar/navbar.component';
 import { TokenInterceptor } from './interceptors/token.interceptor';
 
+registerLocaleData(localeEsAr);
+
 @NgModule({
   declarations: [AppComponent],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule, HomeModule],
   providers: [
+    { provide: LOCALE_ID, useValue: 'es-AR' },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,

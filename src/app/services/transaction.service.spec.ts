@@ -55,6 +55,16 @@ describe('TransactionService', () => {
     http.expectOne((r) => r.params.get('type') === 'income').flush([]);
   });
 
+  it('reload vuelve a pedir lista y resumen', () => {
+    service.transactions$.subscribe();
+    service.summary$.subscribe();
+    http.expectOne(URL).flush([]);
+    http.expectOne(`${URL}/summary`).flush(emptySummary);
+    service.reload();
+    http.expectOne(URL).flush([]);
+    http.expectOne(`${URL}/summary`).flush(emptySummary);
+  });
+
   it('add refresca lista y resumen', () => {
     service.transactions$.subscribe();
     service.summary$.subscribe();

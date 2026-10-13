@@ -1,7 +1,64 @@
-<h3 class="text-zinc-200 text-xl font-bold w-full">Historial</h3>
-<ul class="h-80 md:h-80 overflow-y-scroll">
-  <app-transaction-item
-    *ngFor="let transaction of transactions$ | async"
-    [transaction]="transaction"
-  ></app-transaction-item>
-</ul>
+<section
+  class="grid gap-3.5"
+  *ngIf="{ list: transactions$ | async, loading: loading$ | async, error: error$ | async, f: filters$ | async } as vm"
+>
+  <div class="flex items-center justify-between gap-2">
+    <h2 class="font-display text-lg font-bold text-fg">Historial</h2>
+    <span *ngIf="!vm.loading && vm.list" class="text-sm text-muted" aria-live="polite">
+      {{ vm.list.length }} {{ vm.list.length === 1 ? 'resultado' : 'resultados' }}
+    </span>
+  </div>
+
+  <app-transaction-filters />
+
+  <div
+    *ngIf="vm.error"
+    role="alert"
+    class="flex items-center justify-between gap-3 rounded-[10px] bg-unn-soft px-3 py-2.5 text-sm text-unn"
+  >
+    <span>{{ vm.error }}</span>
+    <button type="button" (click)="retry()" class="font-medium underline">Reintentar</button>
+  </div>
+
+  <ul *ngIf="vm.loading" class="-mx-2 grid" aria-busy="true" aria-label="Cargando historial">
+    <li
+      *ngFor="let s of skeletons"
+      data-testid="skeleton"
+      class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-2 py-2.5"
+    >
+      <span class="h-9 w-9 animate-pulse rounded-[10px] bg-surface-2"></span>
+      <span class="grid gap-1.5">
+        <span class="h-3 w-2/3 animate-pulse rounded bg-surface-2"></span>
+        <span class="h-2.5 w-1/3 animate-pulse rounded bg-surface-2"></span>
+      </span>
+      <span class="h-3 w-16 animate-pulse rounded bg-surface-2"></span>
+    </li>
+  </ul>
+
+  <ul
+    *ngIf="!vm.loading && vm.list?.length"
+    class="-mx-2 grid max-h-[520px] overflow-y-auto divide-y divide-line"
+  >
+    <app-transaction-item
+      *ngFor="let t of vm.list; trackBy: trackById"
+      [transaction]="t"
+      (delete)="onDelete($event)"
+    ></app-transaction-item>
+  </ul>
+
+  <div
+    *ngIf="!vm.loading && !vm.error && vm.list && !vm.list.length"
+    class="grid justify-items-center gap-1.5 px-4 py-8 text-center text-muted"
+  >
+    <ng-container *ngIf="hasFilters(vm.f ?? {}); else vacio">
+      <strong class="font-display text-[17px] text-fg">Ningún resultado con estos filtros</strong>
+      <button type="button" (click)="clearFilters()" class="text-sm underline hover:text-fg">
+        Limpiar filtros
+      </button>
+    </ng-container>
+    <ng-template #vacio>
+      <strong class="font-display text-[17px] text-fg">Tu historial está vacío</strong>
+      <span>Agrega tu primer ingreso o gasto con el formulario.</span>
+    </ng-template>
+  </div>
+</section>

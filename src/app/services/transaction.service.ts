@@ -112,6 +112,10 @@ export class TransactionService {
     this.filtersSubject.next({});
   }
 
+  reload(): void {
+    this.refresh$.next();
+  }
+
   add(dto: AddTransactionDto): Observable<Transaction> {
     return this.http
       .post<Transaction>(this.url, dto)
