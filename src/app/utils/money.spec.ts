@@ -7,7 +7,7 @@ describe('parseMoneyToCents', () => {
     ['$ 2.000,99', 200099], [' 0,01 ', 1], ['0.1', 10],
   ];
   ok.forEach(([i, o]) => it(`"${i}" → ${o}`, () => expect(parseMoneyToCents(i)).toBe(o)));
-  ['', 'abc', '10,555', '-5', '1,2,3', '.', ','].forEach((i) =>
+  ['', 'abc', '10,555', '-5', '1,2,3', '.', ',', '1.500.5', '1.5000', '12.34.567', '1.50,25'].forEach((i) =>
     it(`"${i}" → null`, () => expect(parseMoneyToCents(i)).toBeNull()));
 });
 
