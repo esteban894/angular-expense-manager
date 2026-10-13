@@ -86,4 +86,19 @@ describe('TransactionService', () => {
     http.expectOne(URL).flush({ message: 'x' }, { status: 500, statusText: 'err' });
     expect(err).toBe('No pudimos cargar tus transacciones. Intenta de nuevo.');
   });
+
+  it('summary$ sobrevive a un error HTTP y se recupera en el siguiente refresh', () => {
+    const values: TransactionSummary[] = [];
+    let err = null as string | null;
+    service.error$.subscribe((e) => (err = e));
+    service.summary$.subscribe((s) => values.push(s));
+    http
+      .expectOne(`${URL}/summary`)
+      .flush({ message: 'x' }, { status: 500, statusText: 'err' });
+    expect(err).toBe('No pudimos cargar tu resumen. Intenta de nuevo.');
+    service.add({ amount: 100, typeAmount: TypeAmount.INCOME, description: 'x' }).subscribe();
+    http.expectOne({ method: 'POST', url: URL }).flush({ id: 1 });
+    http.expectOne(`${URL}/summary`).flush(emptySummary);
+    expect(values).toEqual([emptySummary]);
+  });
 });

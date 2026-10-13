@@ -4,6 +4,7 @@ import {
   BehaviorSubject,
   Observable,
   catchError,
+  EMPTY,
   combineLatest,
   map,
   of,
@@ -88,7 +89,16 @@ export class TransactionService {
   );
 
   readonly summary$: Observable<TransactionSummary> = this.refresh$.pipe(
-    switchMap(() => this.http.get<TransactionSummary>(`${this.url}/summary`)),
+    switchMap(() =>
+      this.http.get<TransactionSummary>(`${this.url}/summary`).pipe(
+        catchError(() => {
+          this.errorSubject.next(
+            'No pudimos cargar tu resumen. Intenta de nuevo.'
+          );
+          return EMPTY;
+        })
+      )
+    ),
     shareReplay({ bufferSize: 1, refCount: true })
   );
 
