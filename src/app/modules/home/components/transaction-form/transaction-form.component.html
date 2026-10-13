@@ -3,121 +3,119 @@
   novalidate
   (ngSubmit)="onSubmit($event)"
   autocomplete="off"
+  class="grid gap-4"
 >
-  <div class="mb-5 relative">
-    <input
-      type="text"
-      placeholder="Ingresa una descripción"
-      formControlName="description"
-      class="bg-zinc-600 text-zinc-100 py-3 px-2 rounded-lg block mb-2 w-full"
-    />
-    <ng-container *ngIf="descriptionField?.touched && descriptionField?.errors">
-      <div class="text-red-500 px-2 py-1 rounded absolute top-10 left-0">
-        <span
-          class="block sm:inline"
-          *ngIf="descriptionField?.hasError('required')"
-          >Este campo es requerido</span
+  <h3 id="new-title" class="font-display font-semibold text-lg text-fg">
+    Nueva transacción
+  </h3>
+
+  <fieldset class="border-0 p-0 m-0 min-w-0">
+    <legend class="text-[13px] font-semibold mb-1.5 p-0">Tipo</legend>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+      <div *ngFor="let t of types" class="relative">
+        <input
+          type="radio"
+          [id]="t.id"
+          formControlName="typeAmount"
+          [value]="t.value"
+          [attr.aria-invalid]="showError(typeField) ? 'true' : null"
+          [attr.aria-describedby]="showError(typeField) ? 'err-type' : null"
+          class="peer absolute inset-0 w-full h-full m-0 opacity-0 cursor-pointer"
+        />
+        <label
+          [for]="t.id"
+          class="flex flex-row sm:flex-col items-center sm:items-start gap-1.5 h-full px-3 py-2.5 border rounded-[10px] text-[13px] font-medium cursor-pointer transition-colors hover:border-muted peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent"
+          [ngClass]="
+            typeField.value === t.value
+              ? t.tone === 'inc'
+                ? 'border-inc bg-inc-soft'
+                : t.tone === 'nec'
+                ? 'border-nec bg-nec-soft'
+                : 'border-unn bg-unn-soft'
+              : showError(typeField)
+              ? 'border-unn'
+              : 'border-line'
+          "
         >
+          <span
+            class="w-2 h-2 rounded-full"
+            [ngClass]="
+              t.tone === 'inc' ? 'bg-inc' : t.tone === 'nec' ? 'bg-nec' : 'bg-unn'
+            "
+            aria-hidden="true"
+          ></span>
+          {{ t.label }}
+        </label>
       </div>
-    </ng-container>
-  </div>
-  <div class="mb-5 relative">
-    <input
-      type="number"
-      placeholder="0.0"
-      formControlName="amount"
-      class="bg-zinc-600 text-zinc-100 py-3 px-2 rounded-lg block mb-2 w-full"
-    />
-    <ng-container *ngIf="amountField?.touched && amountField?.errors">
-      <div class="text-red-500 px-2 py-1 rounded absolute top-10 left-0">
-        <span class="block sm:inline" *ngIf="amountField?.hasError('required')"
-          >Este campo es requerido</span
-        >
-        <span *ngIf="amountField?.hasError('min')"
-          >Este campo debe ser mayor a 0</span
-        >
-      </div>
-    </ng-container>
+    </div>
+  </fieldset>
+  <div id="err-type" class="text-[13px] text-unn" aria-live="polite">
+    <span *ngIf="showError(typeField)">Elige si es un ingreso o un gasto.</span>
   </div>
 
-  <div class="mb-5 relative">
-    <h3 class="font-semibold">Tipo de transacción</h3>
-    <div class="flex justify-evenly sm:flex-row flex-col">
-      <label
-        for="transactionType"
-        class="inline-flex px-2 py-1.5 items-center justify-center rounded my-3 mx-1 hover:cursor-pointer"
-        [ngClass]="{
-          'bg-gray-400': transactionTypeField?.value !== 'income',
-          'bg-green-500': transactionTypeField?.value === 'income'
-        }"
-        (click)="transactionTypeField?.setValue('income')"
-      >
-        <input
-          class="appearance-none"
-          type="radio"
-          name="transactionType"
-          value="income"
-          formControlName="transactionType"
-        />
-        <span>Ingreso</span>
-      </label>
-      <label
-        for="transactionType"
-        class="inline-flex px-2 py-1.5 items-center justify-center rounded my-3 mx-1 hover:cursor-pointer"
-        [ngClass]="{
-          'bg-gray-400': transactionTypeField?.value !== 'expense_necessary',
-          'bg-amber-500': transactionTypeField?.value === 'expense_necessary'
-        }"
-        (click)="transactionTypeField?.setValue('expense_necessary')"
-      >
-        <input
-          class="appearance-none"
-          type="radio"
-          name="transactionType"
-          value="expense_necessary"
-          formControlName="transactionType"
-        />
-        <span>Gasto Necesario</span>
-      </label>
-      <label
-        for="transactionType"
-        class="inline-flex px-2 py-1.5 items-center justify-center rounded my-3 mx-1 hover:cursor-pointer"
-        [ngClass]="{
-          'bg-gray-400': transactionTypeField?.value !== 'expense_unnecessary',
-          'bg-red-500': transactionTypeField?.value === 'expense_unnecessary'
-        }"
-        (click)="transactionTypeField?.setValue('expense_unnecessary')"
-      >
-        <input
-          class="appearance-none"
-          type="radio"
-          name="transactionType"
-          value="expense_unnecessary"
-          formControlName="transactionType"
-        />
-        <span>Gasto Innecesario</span>
-      </label>
+  <div class="grid gap-1.5">
+    <label for="desc" class="text-[13px] font-semibold">Descripción</label>
+    <input
+      #descInput
+      id="desc"
+      type="text"
+      formControlName="description"
+      maxlength="80"
+      placeholder="Ej.: Supermercado, sueldo, cine"
+      [attr.aria-invalid]="showError(descriptionField) ? 'true' : null"
+      [attr.aria-describedby]="showError(descriptionField) ? 'err-desc' : null"
+      class="w-full bg-surface text-fg border rounded-[10px] px-3 py-[11px] outline-none transition focus:border-accent focus:ring-[3px] focus:ring-accent-soft placeholder:text-muted/80"
+      [ngClass]="showError(descriptionField) ? 'border-unn' : 'border-line'"
+    />
+    <div id="err-desc" class="text-[13px] text-unn" aria-live="polite">
+      <span *ngIf="showError(descriptionField)">Escribe una descripción corta.</span>
     </div>
-    <ng-container
-      *ngIf="transactionTypeField?.touched && transactionTypeField?.errors"
-    >
-      <div class="text-red-500 px-2 py-1 rounded absolute top-16 left-0">
-        <span
-          class="block sm:inline"
-          *ngIf="transactionTypeField?.hasError('required')"
-          >Este campo es requerido</span
-        >
-      </div>
-    </ng-container>
   </div>
+
+  <div class="grid gap-1.5">
+    <label for="amount" class="text-[13px] font-semibold">Monto</label>
+    <div class="relative flex items-center">
+      <span
+        class="absolute left-3 text-muted pointer-events-none font-num"
+        aria-hidden="true"
+        >$</span
+      >
+      <input
+        id="amount"
+        type="text"
+        formControlName="amount"
+        inputmode="decimal"
+        placeholder="0,00"
+        [attr.aria-invalid]="showError(amountField) ? 'true' : null"
+        [attr.aria-describedby]="showError(amountField) ? 'err-amount' : null"
+        class="w-full bg-surface text-fg border rounded-[10px] py-[11px] pr-3 pl-[30px] font-num outline-none transition focus:border-accent focus:ring-[3px] focus:ring-accent-soft placeholder:text-muted/80"
+        [ngClass]="showError(amountField) ? 'border-unn' : 'border-line'"
+      />
+    </div>
+    <div id="err-amount" class="text-[13px] text-unn" aria-live="polite">
+      <ng-container *ngIf="showError(amountField)">
+        <span *ngIf="amountField.hasError('required')">Escribe un monto.</span>
+        <span *ngIf="amountField.hasError('format')">Usa solo números, por ejemplo 1500,50</span>
+        <span *ngIf="amountField.hasError('decimals')">Usa hasta 2 decimales, por ejemplo 1500,50</span>
+        <span *ngIf="amountField.hasError('min')">El monto debe ser mayor a 0.</span>
+        <span *ngIf="amountField.hasError('max')">{{ maxMessage }}</span>
+      </ng-container>
+    </div>
+  </div>
+
+  <div
+    *ngIf="apiError"
+    class="form-alert text-sm px-3 py-2.5 rounded-[10px] bg-unn-soft text-unn"
+    role="alert"
+  >
+    {{ apiError }}
+  </div>
+
   <button
     type="submit"
-    class="bg-indigo-700 transition ease-in-out delay-75 text-zinc-100 px-3 py-2 rounded-lg block w-full"
-    [ngClass]="{
-      'hover:bg-indigo-600': form.valid,
-      'hover:cursor-not-allowed': form.invalid
-    }"
+    [disabled]="pending"
+    class="inline-flex items-center justify-center gap-2 rounded-[10px] px-4 py-3 font-semibold bg-accent text-accent-fg transition hover:brightness-110 active:translate-y-px disabled:opacity-70 disabled:cursor-progress"
   >
-    Añade una transacción
+    {{ submitLabel }}
   </button>
 </form>
