@@ -2,27 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg: 242 243 247;
+  --surface: 255 255 255;
+  --surface-2: 236 238 244;
+  --fg: 21 25 37;
+  --muted: 92 99 120;
+  --line: 221 224 234;
+  --accent: 51 67 196;
+  --accent-fg: 255 255 255;
+  --accent-soft: 230 232 251;
+  --inc: 17 129 90;
+  --inc-soft: 220 242 232;
+  --nec: 168 107 18;
+  --nec-soft: 248 236 214;
+  --unn: 201 59 49;
+  --unn-soft: 251 226 223;
+  --shadow: 0 1px 2px rgb(21 25 37 / .06), 0 8px 24px -12px rgb(21 25 37 / .12);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: 14 16 22; --surface: 22 25 34; --surface-2: 30 34 45; --fg: 232 234 241; --muted: 148 155 176; --line: 41 46 59;
+    --accent: 138 152 255; --accent-fg: 14 16 22; --accent-soft: 35 42 82;
+    --inc: 67 209 151; --inc-soft: 18 48 31; --nec: 241 184 79; --nec-soft: 51 39 15; --unn: 255 116 104; --unn-soft: 58 26 24;
+    --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 8px 24px -12px rgb(0 0 0 / .6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: 14 16 22; --surface: 22 25 34; --surface-2: 30 34 45; --fg: 232 234 241; --muted: 148 155 176; --line: 41 46 59;
+  --accent: 138 152 255; --accent-fg: 14 16 22; --accent-soft: 35 42 82;
+  --inc: 67 209 151; --inc-soft: 18 48 31; --nec: 241 184 79; --nec-soft: 51 39 15; --unn: 255 116 104; --unn-soft: 58 26 24;
+  --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 8px 24px -12px rgb(0 0 0 / .6);
+  color-scheme: dark;
+}
+
 body {
-  background-color: rgb(24, 24, 27);
+  background-color: rgb(var(--bg));
+  color: rgb(var(--fg));
+  -webkit-font-smoothing: antialiased;
 }
-/* Estilos para la barra de desplazamiento */
-::-webkit-scrollbar {
-  width: 10px; /* Ancho de la barra de desplazamiento */
+.num {
+  font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }
-
-/* Estilo del riel de la barra de desplazamiento */
-::-webkit-scrollbar-track {
-  background: #424242;
-  border-radius: 5px;
+:focus-visible {
+  outline: 2px solid rgb(var(--accent));
+  outline-offset: 2px;
+  border-radius: 6px;
 }
-
-/* Estilo del pulgar de la barra de desplazamiento */
-::-webkit-scrollbar-thumb {
-  background: #353535; /* Color del pulgar */
-  border-radius: 5px;
-}
-
-/* Estilo del pulgar de la barra de desplazamiento al pasar el mouse sobre él */
-::-webkit-scrollbar-thumb:hover {
-  background: #555; /* Color del pulgar al pasar el mouse sobre él */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -1,0 +1,51 @@
+<section
+  *ngIf="view$ | async as v"
+  class="bg-surface border border-line rounded-card p-[22px] shadow-[var(--shadow)] grid gap-5 min-w-0"
+  aria-labelledby="bal-label"
+>
+  <div class="grid gap-1">
+    <span id="bal-label" class="text-xs uppercase tracking-[.08em] text-muted font-semibold">Saldo disponible</span>
+    <span
+      data-testid="balance"
+      class="num font-display font-bold text-[clamp(36px,5vw,48px)] tracking-[-.03em] leading-[1.05]"
+      [ngClass]="v.negative ? 'text-unn' : 'text-fg'"
+      >{{ v.balance }}</span
+    >
+  </div>
+  <div class="grid grid-cols-2 gap-3">
+    <div class="bg-surface-2 rounded-[10px] px-3.5 py-3 grid gap-0.5">
+      <span class="text-[13px] text-muted flex items-center gap-1.5"
+        ><span class="w-2 h-2 rounded-full bg-inc inline-block shrink-0"></span>Ingresos</span
+      >
+      <span data-testid="income" class="num whitespace-nowrap text-[17px] max-[480px]:text-[15px] font-medium text-inc">{{ v.income }}</span>
+    </div>
+    <div class="bg-surface-2 rounded-[10px] px-3.5 py-3 grid gap-0.5">
+      <span class="text-[13px] text-muted flex items-center gap-1.5"
+        ><span class="w-2 h-2 rounded-full bg-unn inline-block shrink-0"></span>Gastos</span
+      >
+      <span data-testid="expense" class="num whitespace-nowrap text-[17px] max-[480px]:text-[15px] font-medium text-unn">{{ v.expense }}</span>
+    </div>
+  </div>
+  <div class="grid gap-2.5 pt-[18px] border-t border-line">
+    <h3 class="font-display text-[17px] tracking-[-.01em]">¿En qué se van tus gastos?</h3>
+    <div class="flex h-3 rounded-full overflow-hidden bg-surface-2 gap-0.5" role="img" [attr.aria-label]="v.barLabel">
+      <span data-testid="bar-nec" class="block h-full bg-nec transition-[width] duration-500" [style.width.%]="v.pctNec"></span>
+      <span data-testid="bar-unn" class="block h-full bg-unn transition-[width] duration-500" [style.width.%]="v.pctUnn"></span>
+    </div>
+    <div class="grid grid-cols-2 gap-2 text-[13px]">
+      <div class="grid gap-px">
+        <span class="flex items-center gap-1.5 text-muted"
+          ><span class="w-2 h-2 rounded-full bg-nec inline-block shrink-0"></span>Necesarios · {{ v.pctNec }}%</span
+        >
+        <span data-testid="amt-nec" class="font-num num">{{ v.necessary }}</span>
+      </div>
+      <div class="grid gap-px">
+        <span class="flex items-center gap-1.5 text-muted"
+          ><span class="w-2 h-2 rounded-full bg-unn inline-block shrink-0"></span>Innecesarios · {{ v.pctUnn }}%</span
+        >
+        <span data-testid="amt-unn" class="font-num num">{{ v.unnecessary }}</span>
+      </div>
+    </div>
+    <p data-testid="insight" class="text-sm bg-surface-2 px-3 py-2.5 rounded-[10px] text-muted">{{ v.insight }}</p>
+  </div>
+</section>

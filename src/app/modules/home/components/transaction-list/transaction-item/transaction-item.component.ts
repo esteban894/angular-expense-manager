@@ -1,18 +1,23 @@
-import { Component, Input } from '@angular/core';
-import { Transaction } from 'src/app/models/transaction.model';
-import { TransactionService } from 'src/app/services/transaction.service';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Transaction, TypeAmount } from 'src/app/models/transaction.model';
+import { formatCents } from 'src/app/utils/money';
+
+const META: Record<TypeAmount, { cls: string; label: string }> = {
+  [TypeAmount.INCOME]: { cls: 'inc', label: 'Ingreso' },
+  [TypeAmount.EXPENSE_NECESSARY]: { cls: 'nec', label: 'Gasto necesario' },
+  [TypeAmount.EXPENSE_UNNECESSARY]: { cls: 'unn', label: 'Gasto innecesario' },
+};
 
 @Component({
   selector: 'app-transaction-item',
   templateUrl: './transaction-item.component.html',
-  styles: [``],
 })
 export class TransactionItemComponent {
   @Input() transaction!: Transaction;
+  @Output() delete = new EventEmitter<Transaction>();
+  formatCents = formatCents;
 
-  constructor(private transactionService: TransactionService) {}
-
-  deleteTransaction(id: number) {
-    this.transactionService.deleteTransaction(id);
+  get meta() {
+    return META[this.transaction.typeAmount];
   }
 }

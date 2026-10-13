@@ -1,128 +1,94 @@
-<div class="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-  <div class="sm:mx-auto sm:w-full sm:max-w-md">
-    <div class="text-center">
-      <h2 class="text-3xl font-extrabold text-zinc-100">
-        Inicia sesión en tu cuenta
-      </h2>
-    </div>
-    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-      <div class="bg-zinc-800 py-8 px-4 shadow sm:rounded-lg sm:px-10">
-        <form
-          class="flex flex-col justify-between items-center w-full"
-          [formGroup]="form"
-          novalidate
-          (ngSubmit)="onSubmit($event)"
-          autocomplete="off"
-        >
-          <div class="w-full mb-5 relative">
-            <label class="font-semibold text-zinc-100">
-              Nombre <span class="text-red-500">*</span>
-            </label>
-
-            <input
-              class="bg-zinc-600 text-zinc-100 px-3 py-2 rounded-lg block mb-2 w-full"
-              type="text"
-              formControlName="name"
-              placeholder="Nombre"
-              autofocus
-            />
-            <ng-container *ngIf="nameField?.touched && nameField?.errors">
-              <div
-                class="text-red-500 px-2 py-1 rounded absolute top-16 left-0"
-              >
-                <span
-                  class="block sm:inline"
-                  *ngIf="nameField?.hasError('required')"
-                  >Este campo es requerido</span
-                >
-              </div>
-            </ng-container>
-          </div>
-          <div class="w-full mb-5 relative">
-            <label class="font-semibold text-zinc-100">
-              Email <span class="text-red-500">*</span>
-            </label>
-
-            <input
-              class="bg-zinc-600 text-zinc-100 px-3 py-2 rounded-lg block mb-2 w-full"
-              type="text"
-              formControlName="email"
-              placeholder="Email"
-            />
-            <ng-container *ngIf="emailField?.touched && emailField?.errors">
-              <div
-                class="text-red-500 px-2 py-1 rounded absolute top-16 left-0"
-              >
-                <span
-                  class="block sm:inline"
-                  *ngIf="emailField?.hasError('required')"
-                  >Este campo es requerido</span
-                >
-                <span
-                  class="block sm:inline"
-                  *ngIf="emailField?.hasError('email')"
-                  >Este campo debe tener el formato de un email</span
-                >
-              </div>
-            </ng-container>
-          </div>
-          <div class="w-full mb-5 relative">
-            <label class="font-semibold text-zinc-100">
-              Contraseña <span class="text-red-500">*</span>
-            </label>
-            <input
-              class="bg-zinc-600 text-zinc-100 px-3 py-2 rounded-lg block mb-2 w-full"
-              type="password"
-              formControlName="password"
-              placeholder="Contraseña"
-            />
-            <ng-container
-              *ngIf="passwordField?.touched && passwordField?.errors"
-            >
-              <div
-                class="text-red-500 px-2 py-1 rounded absolute top-16 left-0"
-              >
-                <span
-                  class="block sm:inline"
-                  *ngIf="passwordField?.hasError('required')"
-                  >Este campo es requerido
-                </span>
-                <span
-                  class="block sm:inline"
-                  *ngIf="passwordField?.hasError('minlength')"
-                  >Este campo debe tener al menos 8 caracteres</span
-                >
-              </div>
-            </ng-container>
-          </div>
-          <div class="w-full mt-2">
-            <button
-              class="bg-indigo-700 transition ease-in-out delay-75 text-zinc-100 px-3 py-2 rounded-lg block mb-5 w-full"
-              [ngClass]="{
-                'hover:bg-indigo-600': form.valid,
-                'hover:cursor-not-allowed': form.invalid
-              }"
-              type="submit"
-            >
-              Iniciar Sesión
-            </button>
-            <p class="text-zinc-100 text-center">
-              ¿Ya tienes una cuenta?
-              <a
-                routerLink="/login"
-                class="text-indigo-700 hover:text-indigo-600 transition ease-in-out delay-75"
-                >¡Logueate aquí!</a
-              >
-            </p>
-            <p
-              *ngIf="errorMessage"
-              class="text-zinc-100 bg-red-400 border rounded p-2 block"
-            >
-              {{ errorMessage }}
-            </p>
-          </div>
-        </form>
-      </div>
-    </div>
+<div class="grid gap-6">
+  <div>
+    <h2 class="font-display font-bold text-[28px] tracking-[-.02em]">Crea tu cuenta</h2>
+    <p class="text-muted mt-1.5">Te toma menos de un minuto. No pedimos datos bancarios.</p>
   </div>
+  <form [formGroup]="form" novalidate (ngSubmit)="onSubmit()" class="grid gap-4">
+    <div class="grid gap-1.5">
+      <label for="name" class="text-[13px] font-semibold">Nombre</label>
+      <input
+        id="name"
+        type="text"
+        formControlName="name"
+        autocomplete="name"
+        placeholder="Ana Pérez"
+        [attr.aria-invalid]="showError('name') ? 'true' : null"
+        [attr.aria-describedby]="showError('name') ? 'err-name' : null"
+        (blur)="onBlur('name')"
+        class="w-full bg-surface text-fg border rounded-[10px] px-3 py-[11px] outline-none transition focus:border-accent focus:ring-[3px] focus:ring-accent-soft placeholder:text-muted/80"
+        [ngClass]="showError('name') ? 'border-unn' : 'border-line'"
+      />
+      <div id="err-name" class="text-[13px] text-unn" aria-live="polite">{{ errorText('name') }}</div>
+    </div>
+    <div class="grid gap-1.5">
+      <label for="email" class="text-[13px] font-semibold">Email</label>
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        autocomplete="email"
+        placeholder="tu@email.com"
+        [attr.aria-invalid]="showError('email') ? 'true' : null"
+        [attr.aria-describedby]="showError('email') ? 'err-email' : null"
+        (blur)="onBlur('email')"
+        class="w-full bg-surface text-fg border rounded-[10px] px-3 py-[11px] outline-none transition focus:border-accent focus:ring-[3px] focus:ring-accent-soft placeholder:text-muted/80"
+        [ngClass]="showError('email') ? 'border-unn' : 'border-line'"
+      />
+      <div id="err-email" class="text-[13px] text-unn" aria-live="polite">{{ errorText('email') }}</div>
+    </div>
+    <div class="grid gap-1.5">
+      <label for="password" class="text-[13px] font-semibold">Contraseña</label>
+      <div class="relative flex items-center">
+        <input
+          id="password"
+          [type]="showPassword ? 'text' : 'password'"
+          formControlName="password"
+          autocomplete="new-password"
+          placeholder="Mínimo 8 caracteres"
+          [attr.aria-invalid]="showError('password') ? 'true' : null"
+          [attr.aria-describedby]="showError('password') ? 'err-password' : null"
+          (blur)="onBlur('password')"
+          class="w-full bg-surface text-fg border rounded-[10px] px-3 py-[11px] outline-none transition focus:border-accent focus:ring-[3px] focus:ring-accent-soft placeholder:text-muted/80 pr-[76px]"
+          [ngClass]="showError('password') ? 'border-unn' : 'border-line'"
+        />
+        <button
+          type="button"
+          id="toggle-pass"
+          aria-controls="password"
+          (click)="showPassword = !showPassword"
+          class="absolute right-1.5 text-muted hover:text-fg px-2 py-1.5 text-[13px] rounded-md outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          {{ showPassword ? 'Ocultar' : 'Mostrar' }}
+        </button>
+      </div>
+      <div id="err-password" class="text-[13px] text-unn" aria-live="polite">{{ errorText('password') }}</div>
+    </div>
+    <div
+      *ngIf="errorMessage"
+      class="form-alert text-sm px-3 py-2.5 rounded-[10px] bg-unn-soft text-unn"
+      role="alert"
+    >
+      {{ errorMessage }}
+    </div>
+    <button
+      type="submit"
+      id="auth-submit"
+      [disabled]="pending"
+      class="inline-flex items-center justify-center gap-2 rounded-[10px] px-4 py-3 font-semibold bg-accent text-accent-fg transition hover:brightness-110 active:translate-y-px disabled:opacity-70 disabled:cursor-progress"
+    >
+      {{ pending ? 'Creando cuenta…' : 'Crear cuenta' }}
+    </button>
+    <div class="flex items-center gap-3 text-muted text-xs uppercase tracking-[.08em]" aria-hidden="true">
+      <span class="flex-1 h-px bg-line"></span>o<span class="flex-1 h-px bg-line"></span>
+    </div>
+    <button
+      type="button"
+      id="demo-login"
+      [disabled]="pending"
+      (click)="loginDemo()"
+      class="inline-flex items-center justify-center rounded-[10px] px-4 py-3 font-semibold border border-line text-fg transition hover:border-muted disabled:opacity-70 disabled:cursor-progress"
+    >
+      Entrar con la cuenta demo
+    </button>
+  </form>
 </div>

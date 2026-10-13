@@ -1,0 +1,80 @@
+<div class="grid md:grid-cols-[1.05fr_1fr] md:min-h-screen bg-bg text-fg">
+  <div
+    class="bg-surface-2 flex flex-col justify-between gap-5 md:gap-10 px-6 py-7 md:py-10 md:px-[clamp(24px,5vw,64px)] border-b md:border-b-0 md:border-r border-line"
+  >
+    <div class="flex items-center gap-2.5 font-display font-bold text-lg tracking-[-.02em]">
+      <span class="w-7 h-7 rounded-lg bg-accent grid place-items-center">
+        <svg class="w-4 h-4" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <rect x="2" y="3" width="12" height="3" rx="1.5" class="fill-bg" />
+          <rect x="2" y="10" width="7" height="3" rx="1.5" class="fill-bg" />
+        </svg>
+      </span>
+      Cuentas Claras
+    </div>
+    <div>
+      <h1
+        class="font-display font-bold text-[clamp(30px,3.6vw,46px)] leading-[1.05] tracking-[-.025em] max-w-[14ch]"
+      >
+        Separa lo que necesitas de lo que
+        <em class="not-italic text-unn">podrías evitar</em>.
+      </h1>
+      <p class="text-muted max-w-[42ch] mt-4 text-base">
+        Registra ingresos y gastos en segundos y descubre qué parte de tu dinero se
+        va en gastos innecesarios.
+      </p>
+    </div>
+    <div
+      class="hidden md:grid gap-3.5 max-w-[400px] bg-surface border border-line rounded-card p-5 shadow-sm"
+      aria-hidden="true"
+    >
+      <div class="flex justify-between text-[13px] text-muted">
+        <span>Saldo disponible</span><span>Este mes</span>
+      </div>
+      <div class="font-display font-bold text-[32px] tracking-[-.02em]">$ 425.400</div>
+      <div class="flex h-2.5 rounded-full overflow-hidden bg-surface-2">
+        <span class="bg-nec" style="width: 72%"></span>
+        <span class="bg-unn" style="width: 28%"></span>
+      </div>
+      <div class="flex justify-between text-[13px] text-muted">
+        <span class="inline-flex items-center gap-1.5"
+          ><span class="w-2 h-2 rounded-full bg-nec"></span>Necesario 72%</span
+        >
+        <span class="inline-flex items-center gap-1.5"
+          ><span class="w-2 h-2 rounded-full bg-unn"></span>Innecesario 28%</span
+        >
+      </div>
+    </div>
+  </div>
+
+  <main class="grid place-items-center px-4 py-10">
+    <div class="w-full max-w-[400px] grid gap-6">
+      <div
+        class="grid grid-cols-2 bg-surface-2 rounded-xl p-1"
+        role="tablist"
+        aria-label="Acceso"
+      >
+        <a
+          routerLink="/login"
+          routerLinkActive
+          #login="routerLinkActive"
+          role="tab"
+          [attr.aria-selected]="login.isActive"
+          class="text-center py-[9px] rounded-[9px] font-medium outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          [ngClass]="login.isActive ? 'bg-surface text-fg shadow-sm' : 'text-muted hover:text-fg'"
+          >Iniciar sesión</a
+        >
+        <a
+          routerLink="/register"
+          routerLinkActive
+          #register="routerLinkActive"
+          role="tab"
+          [attr.aria-selected]="register.isActive"
+          class="text-center py-[9px] rounded-[9px] font-medium outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          [ngClass]="register.isActive ? 'bg-surface text-fg shadow-sm' : 'text-muted hover:text-fg'"
+          >Crear cuenta</a
+        >
+      </div>
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

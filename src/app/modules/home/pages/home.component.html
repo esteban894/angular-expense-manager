@@ -1,18 +1,18 @@
-<div
-  class="bg-zinc-900 text-zinc-100 h-full flex justify-center items-center mt-24"
->
-  <div class="container mx-auto sm:w-full xl:w-3/6">
-    <div
-      class="bg-zinc-800 h-full m-3 sm:min-h-[30rem] p-10 rounded-lg flex gap-x-2 flex-col sm:flex-row"
-    >
-      <div class="w-full">
-        <app-income-expense />
-        <app-balance />
+<main class="max-w-[1120px] mx-auto px-4 pt-7 pb-16 grid gap-5">
+  <div class="flex flex-wrap items-end justify-between gap-2">
+    <h1 class="font-display font-bold text-[clamp(24px,3vw,32px)] tracking-[-.02em] text-fg">
+      Hola<ng-container *ngIf="name">, {{ name }}</ng-container>
+    </h1>
+  </div>
+  <div class="grid md:grid-cols-[1fr_1.15fr] gap-5 items-start">
+    <div class="grid gap-5 min-w-0">
+      <app-summary-card />
+      <div class="bg-surface border border-line rounded-card p-[22px] min-w-0">
         <app-transaction-form />
       </div>
-      <div class="w-full">
-        <app-transaction-list />
-      </div>
+    </div>
+    <div class="bg-surface border border-line rounded-card p-[22px] min-w-0">
+      <app-transaction-list />
     </div>
   </div>
-</div>
+</main>

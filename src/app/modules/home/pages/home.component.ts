@@ -1,14 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { TransactionService } from 'src/app/services/transaction.service';
+import { Component } from '@angular/core';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
 })
-export class HomeComponent implements OnInit {
-  constructor(private transactionService: TransactionService) {}
-  ngOnInit(): void {
-    this.transactionService.init();
+export class HomeComponent {
+  readonly name: string;
+
+  constructor(userService: UserService) {
+    const local = (userService.getEmail() ?? '').split('@')[0];
+    this.name = local.charAt(0).toUpperCase() + local.slice(1);
   }
 }

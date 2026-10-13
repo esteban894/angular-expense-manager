@@ -1,17 +1,38 @@
 <li
-  class="bg-zinc-600 text-zinc-100 px-3 py-1 rounded-lg mb-2 w-full flex justify-between items-center"
+  class="group grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 max-[480px]:grid-cols-[minmax(0,1fr)_auto_auto] max-[480px]:gap-2 rounded-[10px] px-2 py-2.5 hover:bg-surface-2"
 >
-  <p class="text-sm" [title]="transaction.description">
-    {{ transaction.description | slice : 0 : 35
-    }}<span *ngIf="transaction.description.length > 35">...</span>
-  </p>
-  <div>
-    <span>${{ transaction.amount }}</span>
-    <button
-      (click)="deleteTransaction(transaction.id)"
-      class="bg-indigo-700 text-zinc-100 px-2 rounded-md ml-2 transition ease-in-out delay-75 hover:bg-indigo-600"
-    >
-      x
-    </button>
+  <span
+    class="grid h-9 w-9 flex-none place-items-center rounded-[10px] max-[480px]:hidden"
+    [ngClass]="{
+      'bg-inc-soft text-inc': meta.cls === 'inc',
+      'bg-nec-soft text-nec': meta.cls === 'nec',
+      'bg-unn-soft text-unn': meta.cls === 'unn'
+    }"
+    aria-hidden="true"
+  >
+    <svg *ngIf="meta.cls === 'inc'" class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>
+    <svg *ngIf="meta.cls === 'nec'" class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6 10v10h12V10"/><path d="M10 20v-5h4v5"/></svg>
+    <svg *ngIf="meta.cls === 'unn'" class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+  </span>
+  <div class="min-w-0">
+    <div data-testid="desc" class="truncate font-medium text-fg" [title]="transaction.description">
+      {{ transaction.description }}
+    </div>
+    <div data-testid="sub" class="truncate text-xs text-muted">{{ meta.label }} · {{ transaction.createdAt | date : 'd MMM' }}</div>
   </div>
+  <span
+    data-testid="amount"
+    class="font-num text-right font-medium tabular-nums max-[480px]:text-sm"
+    [ngClass]="transaction.amount > 0 ? 'text-inc' : 'text-fg'"
+    >{{ formatCents(transaction.amount, { signed: true }) }}</span
+  >
+  <button
+    type="button"
+    (click)="delete.emit(transaction)"
+    [attr.aria-label]="'Eliminar ' + transaction.description"
+    title="Eliminar"
+    class="grid h-8 w-8 place-items-center rounded-lg text-muted opacity-0 transition-opacity hover:bg-unn-soft hover:text-unn focus-visible:opacity-100 group-hover:opacity-100 [@media(hover:none)]:opacity-100"
+  >
+    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></svg>
+  </button>
 </li>

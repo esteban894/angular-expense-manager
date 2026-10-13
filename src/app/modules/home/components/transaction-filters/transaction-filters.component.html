@@ -1,0 +1,70 @@
+<div class="grid gap-3" *ngIf="{ f: filters$ | async, s: summary$ | async } as vm">
+  <div class="flex gap-1.5 overflow-x-auto pb-0.5" role="group" aria-label="Filtrar por tipo">
+    <button
+      *ngFor="let c of chips"
+      type="button"
+      [attr.aria-pressed]="(vm.f?.type ?? undefined) === c.type"
+      (click)="select(c.type)"
+      class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1.5 text-[13px] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+      [ngClass]="
+        (vm.f?.type ?? undefined) === c.type
+          ? 'bg-fg text-bg border-fg'
+          : 'bg-surface text-fg border-line hover:border-muted'
+      "
+    >
+      <span *ngIf="c.dot" class="h-2 w-2 rounded-full" [ngClass]="c.dot" aria-hidden="true"></span>
+      {{ c.label }}
+      <span class="font-num text-xs opacity-75">{{
+        c.type ? vm.s?.counts?.[c.type] ?? 0 : total(vm.s?.counts)
+      }}</span>
+    </button>
+  </div>
+
+  <div class="grid gap-2 sm:grid-cols-[1.4fr_1fr_1fr]">
+    <div class="grid gap-1">
+      <label for="filter-search" class="text-xs text-muted">Buscar</label>
+      <input
+        id="filter-search"
+        type="search"
+        [formControl]="search"
+        maxlength="80"
+        placeholder="Buscar por descripción"
+        class="w-full rounded-[10px] border border-line bg-surface-2 px-3 py-2 text-sm text-fg"
+      />
+    </div>
+    <div class="grid gap-1">
+      <label for="filter-from" class="text-xs text-muted">Desde</label>
+      <input
+        id="filter-from"
+        type="date"
+        [formControl]="from"
+        [max]="to.value && to.value < today ? to.value : today"
+        [attr.aria-invalid]="rangeError"
+        [attr.aria-describedby]="rangeError ? 'filter-range-error' : null"
+        class="w-full rounded-[10px] border border-line bg-surface-2 px-3 py-2 text-sm text-fg"
+      />
+    </div>
+    <div class="grid gap-1">
+      <label for="filter-to" class="text-xs text-muted">Hasta</label>
+      <input
+        id="filter-to"
+        type="date"
+        [formControl]="to"
+        [max]="today"
+        [attr.aria-invalid]="rangeError"
+        [attr.aria-describedby]="rangeError ? 'filter-range-error' : null"
+        class="w-full rounded-[10px] border border-line bg-surface-2 px-3 py-2 text-sm text-fg"
+      />
+    </div>
+  </div>
+
+  <p *ngIf="rangeError" id="filter-range-error" role="alert" class="text-sm text-unn">
+    La fecha desde no puede ser posterior a hasta
+  </p>
+
+  <div *ngIf="hasFilters(vm.f ?? {})">
+    <button type="button" (click)="clear()" class="text-sm text-muted underline hover:text-fg">
+      Limpiar filtros
+    </button>
+  </div>
+</div>

@@ -1,64 +1,34 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
+import { emailFormat, notBlank } from '../auth-form';
+import { AuthFormBase } from '../auth-form-base';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss'],
 })
-export class RegisterComponent {
+export class RegisterComponent extends AuthFormBase {
   form: FormGroup;
-  errorMessage: string | null = null;
 
-  constructor(
-    private authService: AuthService,
-    private fb: FormBuilder,
-    private router: Router
-  ) {
+  constructor(authService: AuthService, router: Router, host: ElementRef<HTMLElement>, fb: FormBuilder) {
+    super(authService, router, host);
     this.form = fb.group({
-      name: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
+      name: ['', [notBlank]],
+      email: ['', [Validators.required, emailFormat]],
       password: ['', [Validators.required, Validators.minLength(8)]],
     });
   }
 
-  get nameField() {
-    return this.form.get('name');
-  }
-
-  get emailField() {
-    return this.form.get('email');
-  }
-
-  get passwordField() {
-    return this.form.get('password');
-  }
-
-  onSubmit(event: Event) {
-    event.preventDefault();
-
-    if (this.form.valid) {
-      this.errorMessage = null;
-      this.authService
-        .registerAndLogin(
-          this.nameField!.value,
-          this.emailField!.value,
-          this.passwordField!.value
-        )
-        .subscribe({
-          next: () => {
-            this.router.navigate(['/app']);
-          },
-          error: (err) => {
-            this.errorMessage = err.error.message;
-          },
-        });
-
-      this.form.reset();
-    } else {
-      this.form.markAllAsTouched();
+  onSubmit() {
+    this.submitted = true;
+    if (this.form.invalid) {
+      this.focusFirstInvalid();
+      return;
     }
+    if (this.pending) return;
+    const v = this.form.value;
+    this.run(this.authService.registerAndLogin(v.name.trim(), v.email.trim(), v.password), 'register');
   }
 }

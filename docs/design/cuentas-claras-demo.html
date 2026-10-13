@@ -1,0 +1,706 @@
+<title>Cuentas Claras</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: app shell — barra superior fija, área de trabajo en 2 columnas (resumen + carga | historial) que pasa a 1 columna en móvil */
+:root {
+  --bg: #f2f3f7;
+  --surface: #ffffff;
+  --surface-2: #eceef4;
+  --fg: #151925;
+  --muted: #5c6378;
+  --line: #dde0ea;
+  --accent: #3343c4;
+  --accent-fg: #ffffff;
+  --accent-soft: #e6e8fb;
+  --inc: #11815a;
+  --inc-soft: #dcf2e8;
+  --nec: #a86b12;
+  --nec-soft: #f8ecd6;
+  --unn: #c93b31;
+  --unn-soft: #fbe2df;
+  --shadow: 0 1px 2px rgb(21 25 37 / .06), 0 8px 24px -12px rgb(21 25 37 / .12);
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --f-num: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1016; --surface: #161922; --surface-2: #1e222d; --fg: #e8eaf1; --muted: #949bb0; --line: #292e3b;
+    --accent: #8a98ff; --accent-fg: #0e1016; --accent-soft: #232a52;
+    --inc: #43d197; --inc-soft: #12301f; --nec: #f1b84f; --nec-soft: #33270f; --unn: #ff7468; --unn-soft: #3a1a18;
+    --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 8px 24px -12px rgb(0 0 0 / .6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1016; --surface: #161922; --surface-2: #1e222d; --fg: #e8eaf1; --muted: #949bb0; --line: #292e3b;
+  --accent: #8a98ff; --accent-fg: #0e1016; --accent-soft: #232a52;
+  --inc: #43d197; --inc-soft: #12301f; --nec: #f1b84f; --nec-soft: #33270f; --unn: #ff7468; --unn-soft: #3a1a18;
+  --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 8px 24px -12px rgb(0 0 0 / .6);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.5 var(--f-body); -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+.num { font-family: var(--f-num); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+
+/* ---------- barra de demo ---------- */
+.demo-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; justify-content: space-between;
+  padding: 8px 16px; background: var(--surface-2); border-bottom: 1px dashed var(--line); font-size: 13px; color: var(--muted);
+}
+.demo-bar .group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+.seg button { border: 0; background: none; padding: 4px 12px; border-radius: 999px; color: var(--muted); font-size: 13px; }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.chip-btn { border: 1px solid var(--line); background: var(--surface); padding: 5px 12px; border-radius: 999px; font-size: 13px; display: inline-flex; gap: 6px; align-items: center; }
+.chip-btn:hover { border-color: var(--muted); }
+.badge { background: var(--accent); color: var(--accent-fg); border-radius: 999px; font-size: 11px; padding: 0 6px; font-weight: 600; }
+
+/* ---------- logo ---------- */
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-weight: 700; font-size: 19px; letter-spacing: -.01em; }
+.mark { width: 28px; height: 28px; border-radius: 8px; background: var(--fg); display: grid; place-items: center; }
+.mark svg { width: 16px; height: 16px; }
+
+/* ---------- auth ---------- */
+.auth { display: grid; grid-template-columns: 1.05fr 1fr; min-height: calc(100vh - 46px); }
+.auth-aside {
+  background: var(--surface-2); padding: 40px clamp(24px, 5vw, 64px); display: flex; flex-direction: column; justify-content: space-between; gap: 40px;
+  border-right: 1px solid var(--line);
+}
+.auth-aside h1 { font-size: clamp(30px, 3.6vw, 46px); line-height: 1.05; letter-spacing: -.025em; font-weight: 700; max-width: 14ch; }
+.auth-aside h1 em { font-style: normal; color: var(--unn); }
+.auth-aside p.lead { color: var(--muted); max-width: 42ch; margin: 16px 0 0; font-size: 16px; }
+.preview { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; box-shadow: var(--shadow); max-width: 400px; display: grid; gap: 14px; }
+.preview .row { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); }
+.auth-main { display: grid; place-items: center; padding: 40px 16px; }
+.auth-card { width: 100%; max-width: 400px; display: grid; gap: 24px; }
+.tabs { display: grid; grid-template-columns: 1fr 1fr; background: var(--surface-2); border-radius: 12px; padding: 4px; }
+.tabs button { border: 0; background: none; padding: 9px; border-radius: 9px; color: var(--muted); font-weight: 500; }
+.tabs button[aria-selected="true"] { background: var(--surface); color: var(--fg); box-shadow: var(--shadow); }
+.auth-card h2 { font-size: 28px; letter-spacing: -.02em; }
+.auth-card .sub { color: var(--muted); margin: 6px 0 0; }
+
+/* ---------- formularios ---------- */
+form { display: grid; gap: 16px; }
+.field { display: grid; gap: 6px; }
+.field label { font-size: 13px; font-weight: 600; }
+.input-wrap { position: relative; display: flex; align-items: center; }
+.input {
+  width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.input::placeholder { color: var(--muted); opacity: .8; }
+.input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.field.invalid .input { border-color: var(--unn); }
+.field.invalid .input:focus { box-shadow: 0 0 0 3px var(--unn-soft); }
+.err { font-size: 13px; color: var(--unn); min-height: 0; display: flex; gap: 6px; align-items: center; }
+.err:empty { display: none; }
+.prefix { position: absolute; left: 12px; color: var(--muted); pointer-events: none; font-family: var(--f-num); }
+.input.has-prefix { padding-left: 30px; font-family: var(--f-num); }
+.suffix-btn { position: absolute; right: 6px; border: 0; background: none; color: var(--muted); padding: 6px 8px; font-size: 13px; border-radius: 6px; }
+.suffix-btn:hover { color: var(--fg); }
+.btn {
+  border: 0; border-radius: 10px; padding: 12px 16px; font-weight: 600; background: var(--accent); color: var(--accent-fg);
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: filter .15s, transform .1s;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn:active { transform: translateY(1px); }
+.btn[disabled] { opacity: .7; cursor: progress; }
+.btn-ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+.btn-ghost:hover { filter: none; border-color: var(--muted); }
+.divider { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+.divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.form-alert { font-size: 14px; padding: 10px 12px; border-radius: 10px; background: var(--unn-soft); color: var(--unn); }
+.spinner { width: 16px; height: 16px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- panel ---------- */
+.topbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.topbar-in { max-width: 1120px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.user { display: flex; align-items: center; gap: 10px; font-size: 14px; min-width: 0; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-weight: 600; font-size: 13px; flex: none; }
+.user .email { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn-sm { padding: 7px 12px; font-size: 13px; border-radius: 8px; }
+
+.dash { max-width: 1120px; margin: 0 auto; padding: 28px 16px 64px; display: grid; gap: 20px; }
+.greet { display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 8px; }
+.greet h1 { font-size: clamp(24px, 3vw, 32px); letter-spacing: -.02em; }
+.greet p { margin: 2px 0 0; color: var(--muted); }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 20px; align-items: start; }
+.col { display: grid; gap: 20px; min-width: 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 22px; min-width: 0; }
+.card h3 { font-size: 17px; letter-spacing: -.01em; }
+.eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+
+.summary { box-shadow: var(--shadow); display: grid; gap: 20px; }
+.balance { display: grid; gap: 4px; }
+.balance .amount { font-family: var(--f-display); font-weight: 700; font-size: clamp(36px, 5vw, 48px); letter-spacing: -.03em; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.balance .amount.neg { color: var(--unn); }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.stat { background: var(--surface-2); border-radius: 10px; padding: 12px 14px; display: grid; gap: 2px; }
+.stat .k { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.stat .v { font-size: 17px; font-weight: 500; }
+.stat.inc .v { color: var(--inc); } .stat.exp .v { color: var(--unn); }
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex: none; }
+.dot.inc { background: var(--inc); } .dot.nec { background: var(--nec); } .dot.unn { background: var(--unn); }
+
+.split { display: grid; gap: 10px; padding-top: 18px; border-top: 1px solid var(--line); }
+.split-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.bar { display: flex; height: 12px; border-radius: 999px; overflow: hidden; background: var(--surface-2); gap: 2px; }
+.bar span { display: block; height: 100%; transition: width .5s cubic-bezier(.2,.7,.2,1); }
+.bar .nec { background: var(--nec); } .bar .unn { background: var(--unn); }
+.legend { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; }
+.legend div { display: grid; gap: 1px; }
+.legend .l { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+.legend .v { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
+.insight { font-size: 14px; background: var(--surface-2); padding: 10px 12px; border-radius: 10px; color: var(--muted); }
+.insight strong { color: var(--fg); font-weight: 600; }
+
+.types { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; border: 0; padding: 0; margin: 0; }
+.types legend { font-size: 13px; font-weight: 600; margin-bottom: 6px; padding: 0; }
+.type-opt { position: relative; }
+.type-opt input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.type-opt label {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px;
+  font-size: 13px; font-weight: 500; cursor: pointer; transition: border-color .15s, background .15s; height: 100%;
+}
+.type-opt label:hover { border-color: var(--muted); }
+.type-opt input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
+.type-opt input:checked + label.inc { border-color: var(--inc); background: var(--inc-soft); }
+.type-opt input:checked + label.nec { border-color: var(--nec); background: var(--nec-soft); }
+.type-opt input:checked + label.unn { border-color: var(--unn); background: var(--unn-soft); }
+.types.invalid .type-opt label { border-color: var(--unn); }
+
+.history { display: grid; gap: 14px; }
+.history-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.count { font-size: 13px; color: var(--muted); }
+.filters { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.filters button {
+  flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; font-size: 13px; color: var(--muted);
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.filters button[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.filters .n { font-family: var(--f-num); font-size: 12px; opacity: .75; }
+.list { list-style: none; margin: 0; padding: 0; display: grid; max-height: 520px; overflow-y: auto; margin-inline: -8px; }
+.item { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: 12px; padding: 10px 8px; border-radius: 10px; }
+.item + .item { border-top: 1px solid var(--line); }
+.item:hover { background: var(--surface-2); }
+.item.fresh { animation: fresh 1.4s ease-out; }
+@keyframes fresh { from { background: var(--accent-soft); } to { background: transparent; } }
+.ico { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; flex: none; }
+.ico svg { width: 18px; height: 18px; }
+.ico.inc { background: var(--inc-soft); color: var(--inc); }
+.ico.nec { background: var(--nec-soft); color: var(--nec); }
+.ico.unn { background: var(--unn-soft); color: var(--unn); }
+.desc { min-width: 0; }
+.desc .t { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.desc .s { font-size: 12px; color: var(--muted); }
+.amt { font-family: var(--f-num); font-variant-numeric: tabular-nums; font-weight: 500; text-align: right; }
+.amt.inc { color: var(--inc); }
+.del { border: 0; background: none; color: var(--muted); width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; opacity: 0; transition: opacity .15s; }
+.del svg { width: 16px; height: 16px; }
+.item:hover .del, .del:focus-visible { opacity: 1; }
+.del:hover { color: var(--unn); background: var(--unn-soft); }
+@media (hover: none) { .del { opacity: 1; } }
+.empty { text-align: center; padding: 32px 16px; color: var(--muted); display: grid; gap: 6px; justify-items: center; }
+.empty strong { color: var(--fg); font-family: var(--f-display); font-size: 17px; }
+
+/* ---------- toast ---------- */
+.toast {
+  position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 20;
+  background: var(--fg); color: var(--bg); border-radius: 12px; padding: 10px 10px 10px 16px; display: flex; gap: 14px; align-items: center;
+  font-size: 14px; box-shadow: var(--shadow); max-width: calc(100% - 32px);
+}
+.toast button { border: 0; background: none; color: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; padding: 4px 6px; }
+
+/* ---------- notas de diseño ---------- */
+.notes {
+  position: fixed; top: 0; right: 0; bottom: 0; width: min(420px, 100%); z-index: 30; background: var(--surface); border-left: 1px solid var(--line);
+  box-shadow: -12px 0 40px -20px rgb(0 0 0 / .35); overflow-y: auto; padding: calc(20px + env(safe-area-inset-top, 0px)) 22px calc(28px + env(safe-area-inset-bottom, 0px));
+}
+.notes-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.notes h2 { font-size: 22px; letter-spacing: -.02em; }
+.notes > p { color: var(--muted); margin: 0 0 18px; font-size: 14px; }
+.notes ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 14px; counter-reset: n; }
+.notes li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; counter-increment: n; font-size: 14px; }
+.notes li::before { content: counter(n); font-family: var(--f-num); font-size: 12px; width: 24px; height: 24px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
+.notes li b { display: block; font-weight: 600; }
+.notes li span { color: var(--muted); }
+.tag { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; padding: 1px 6px; border-radius: 4px; margin-left: 6px; vertical-align: 1px; }
+.tag.fix { background: var(--unn-soft); color: var(--unn); }
+.tag.ux { background: var(--accent-soft); color: var(--accent); }
+.scrim { position: fixed; inset: 0; background: rgb(0 0 0 / .3); z-index: 25; }
+
+@media (max-width: 860px) {
+  .auth { grid-template-columns: 1fr; min-height: 0; }
+  .auth-aside { border-right: 0; border-bottom: 1px solid var(--line); padding-block: 28px; gap: 20px; }
+  .auth-aside .preview { display: none; }
+  .grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 480px) {
+  .user .email { display: none; }
+  .types { grid-template-columns: 1fr; }
+  .type-opt label { flex-direction: row; align-items: center; }
+  .card { padding: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+</style>
+
+<div class="demo-bar" role="region" aria-label="Controles de la demo">
+  <div class="group">
+    <span>Demo de rediseño · vista</span>
+    <div class="seg" role="group" aria-label="Pantalla">
+      <button type="button" data-view="auth" aria-pressed="false">Inicio de sesión</button>
+      <button type="button" data-view="dash" aria-pressed="true">Panel</button>
+    </div>
+  </div>
+  <div class="group">
+    <button type="button" class="chip-btn" id="theme-btn">Tema: <span id="theme-label">sistema</span></button>
+    <button type="button" class="chip-btn" id="notes-btn">Qué cambió <span class="badge">10</span></button>
+  </div>
+</div>
+
+<!-- ===================== AUTH ===================== -->
+<section id="view-auth" hidden>
+  <div class="auth">
+    <div class="auth-aside">
+      <div class="brand"><span class="mark"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="3" rx="1.5" fill="var(--bg)"/><rect x="2" y="10" width="7" height="3" rx="1.5" fill="var(--bg)"/></svg></span>Cuentas Claras</div>
+      <div>
+        <h1>Separa lo que necesitas de lo que <em>podrías evitar</em>.</h1>
+        <p class="lead">Registra ingresos y gastos en segundos y descubre qué parte de tu dinero se va en gastos innecesarios.</p>
+      </div>
+      <div class="preview" aria-hidden="true">
+        <div class="row"><span>Saldo disponible</span><span class="num">Este mes</span></div>
+        <div class="balance"><span class="amount" style="font-size:32px">$ 425.400</span></div>
+        <div class="bar"><span class="nec" style="width:72%"></span><span class="unn" style="width:28%"></span></div>
+        <div class="row"><span><span class="dot nec"></span> Necesario 72%</span><span><span class="dot unn"></span> Innecesario 28%</span></div>
+      </div>
+    </div>
+
+    <div class="auth-main">
+      <div class="auth-card">
+        <div class="tabs" role="tablist" aria-label="Acceso">
+          <button type="button" role="tab" id="tab-login" aria-selected="true">Iniciar sesión</button>
+          <button type="button" role="tab" id="tab-register" aria-selected="false">Crear cuenta</button>
+        </div>
+        <div>
+          <h2 id="auth-title">Bienvenido de nuevo</h2>
+          <p class="sub" id="auth-sub">Ingresa con tu email para ver tu balance.</p>
+        </div>
+        <form id="auth-form" novalidate>
+          <div class="field" id="f-name" hidden>
+            <label for="name">Nombre</label>
+            <input class="input" id="name" name="name" autocomplete="name" placeholder="Ana Pérez">
+            <div class="err" id="err-name" aria-live="polite"></div>
+          </div>
+          <div class="field" id="f-email">
+            <label for="email">Email</label>
+            <input class="input" id="email" name="email" type="email" autocomplete="email" placeholder="tu@email.com">
+            <div class="err" id="err-email" aria-live="polite"></div>
+          </div>
+          <div class="field" id="f-pass">
+            <label for="password">Contraseña</label>
+            <div class="input-wrap">
+              <input class="input" id="password" name="password" type="password" autocomplete="current-password" placeholder="Mínimo 8 caracteres" style="padding-right:70px">
+              <button type="button" class="suffix-btn" id="toggle-pass" aria-controls="password">Mostrar</button>
+            </div>
+            <div class="err" id="err-pass" aria-live="polite"></div>
+          </div>
+          <div class="form-alert" id="auth-alert" hidden></div>
+          <button class="btn" type="submit" id="auth-submit">Iniciar sesión</button>
+          <div class="divider">o</div>
+          <button class="btn btn-ghost" type="button" id="demo-login">Entrar con la cuenta demo</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PANEL ===================== -->
+<section id="view-dash">
+  <header class="topbar">
+    <div class="topbar-in">
+      <div class="brand"><span class="mark"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="3" rx="1.5" fill="var(--bg)"/><rect x="2" y="10" width="7" height="3" rx="1.5" fill="var(--bg)"/></svg></span>Cuentas Claras</div>
+      <div class="user">
+        <span class="avatar" aria-hidden="true">AP</span>
+        <span class="email">demo@cuentasclaras.app</span>
+        <button type="button" class="btn btn-ghost btn-sm" id="logout">Cerrar sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dash">
+    <div class="greet">
+      <div>
+        <h1>Hola, Ana</h1>
+        <p>Datos de ejemplo para la demo.</p>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="col">
+        <section class="card summary" aria-labelledby="bal-label">
+          <div class="balance">
+            <span class="eyebrow" id="bal-label">Saldo disponible</span>
+            <span class="amount" id="balance">$ 0</span>
+          </div>
+          <div class="stats">
+            <div class="stat inc"><span class="k"><span class="dot inc"></span>Ingresos</span><span class="v num" id="income">$ 0</span></div>
+            <div class="stat exp"><span class="k"><span class="dot unn"></span>Gastos</span><span class="v num" id="expense">$ 0</span></div>
+          </div>
+          <div class="split">
+            <div class="split-head">
+              <h3>¿En qué se van tus gastos?</h3>
+            </div>
+            <div class="bar" role="img" id="split-bar" aria-label=""><span class="nec" id="bar-nec"></span><span class="unn" id="bar-unn"></span></div>
+            <div class="legend">
+              <div><span class="l"><span class="dot nec"></span>Necesarios · <span id="pct-nec">0%</span></span><span class="v" id="amt-nec">$ 0</span></div>
+              <div><span class="l"><span class="dot unn"></span>Innecesarios · <span id="pct-unn">0%</span></span><span class="v" id="amt-unn">$ 0</span></div>
+            </div>
+            <p class="insight" id="insight"></p>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="new-title">
+          <form id="tx-form" novalidate>
+            <h3 id="new-title">Nueva transacción</h3>
+            <fieldset class="types" id="types">
+              <legend>Tipo</legend>
+              <div class="type-opt"><input type="radio" name="type" id="t-inc" value="income"><label for="t-inc" class="inc"><span class="dot inc"></span>Ingreso</label></div>
+              <div class="type-opt"><input type="radio" name="type" id="t-nec" value="expense_necessary"><label for="t-nec" class="nec"><span class="dot nec"></span>Gasto necesario</label></div>
+              <div class="type-opt"><input type="radio" name="type" id="t-unn" value="expense_unnecessary"><label for="t-unn" class="unn"><span class="dot unn"></span>Gasto innecesario</label></div>
+            </fieldset>
+            <div class="err" id="err-type" aria-live="polite"></div>
+            <div class="field" id="f-desc">
+              <label for="desc">Descripción</label>
+              <input class="input" id="desc" maxlength="80" placeholder="Ej.: Supermercado, sueldo, cine">
+              <div class="err" id="err-desc" aria-live="polite"></div>
+            </div>
+            <div class="field" id="f-amount">
+              <label for="amount">Monto</label>
+              <div class="input-wrap">
+                <span class="prefix">$</span>
+                <input class="input has-prefix" id="amount" inputmode="decimal" placeholder="0,00">
+              </div>
+              <div class="err" id="err-amount" aria-live="polite"></div>
+            </div>
+            <button class="btn" type="submit" id="tx-submit">Agregar transacción</button>
+          </form>
+        </section>
+      </div>
+
+      <section class="card history" aria-labelledby="hist-title">
+        <div class="history-head">
+          <h3 id="hist-title">Historial</h3>
+          <span class="count" id="count"></span>
+        </div>
+        <div class="filters" role="group" aria-label="Filtrar por tipo" id="filters"></div>
+        <ul class="list" id="list"></ul>
+      </section>
+    </div>
+  </main>
+</section>
+
+<div class="toast" id="toast" role="status" hidden><span id="toast-msg"></span><button type="button" id="toast-undo">Deshacer</button></div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="notes" id="notes" hidden aria-labelledby="notes-title">
+  <div class="notes-head">
+    <h2 id="notes-title">Qué cambió</h2>
+    <button type="button" class="chip-btn" id="notes-close">Cerrar</button>
+  </div>
+  <p>Comparado con la versión actual del repo. Dime qué quieres conservar, cambiar o descartar.</p>
+  <ol>
+    <li><div><b>El saldo manda<span class="tag ux">UX</span></b><span>Es lo primero que se lee, en grande. Ingresos y gastos quedan como apoyo debajo.</span></div></li>
+    <li><div><b>Necesario vs. innecesario a la vista<span class="tag ux">UX</span></b><span>Es lo que diferencia al proyecto y antes no se veía en ningún lado. Ahora hay una barra con porcentajes y una frase que lo resume.</span></div></li>
+    <li><div><b>Selector de tipo accesible<span class="tag ux">UX</span></b><span>Radios reales, con teclado y foco visible. Antes los tres labels usaban el mismo <code>for</code> y el click iba por un handler.</span></div></li>
+    <li><div><b>Errores que no se superponen<span class="tag fix">Fix</span></b><span>Los mensajes estaban en <code>absolute top-16</code> y tapaban el campo siguiente. Ahora ocupan su propio espacio y el campo se marca en rojo.</span></div></li>
+    <li><div><b>Historial legible<span class="tag ux">UX</span></b><span>Icono y color por tipo, monto con signo, filtros con contador y estado vacío. La descripción se recorta con CSS, no con <code>slice</code>.</span></div></li>
+    <li><div><b>Eliminar con deshacer<span class="tag ux">UX</span></b><span>La "x" borraba sin aviso. Ahora hay un icono claro y un aviso con "Deshacer".</span></div></li>
+    <li><div><b>Login y registro en una tarjeta<span class="tag fix">Fix</span></b><span>El registro decía "Inicia sesión en tu cuenta" y su botón "Iniciar Sesión". Ahora son pestañas con textos propios.</span></div></li>
+    <li><div><b>Cuenta demo<span class="tag ux">Portfolio</span></b><span>Un botón para entrar sin registrarse. Quien revisa tu portfolio llega al panel en un click.</span></div></li>
+    <li><div><b>Decimales correctos<span class="tag fix">Fix</span></b><span><code>income-expense</code> usa <code>parseInt</code> y descarta los centavos. Los montos ahora usan formato de moneda local.</span></div></li>
+    <li><div><b>Identidad y temas<span class="tag ux">Visual</span></b><span>Nombre propuesto "Cuentas Claras", tipografía propia, cifras monoespaciadas, tema claro y oscuro, diseño responsive. Se mantiene el índigo original como color principal.</span></div></li>
+  </ol>
+</aside>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const fmt = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  const money = (n) => fmt.format(n);
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch {} }
+  };
+
+  const ICONS = {
+    inc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>',
+    nec: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6 10v10h12V10"/><path d="M10 20v-5h4v5"/></svg>',
+    unn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>',
+    del: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></svg>'
+  };
+  const TYPES = {
+    income: { cls: 'inc', label: 'Ingreso', verb: 'Agregar ingreso' },
+    expense_necessary: { cls: 'nec', label: 'Gasto necesario', verb: 'Agregar gasto necesario' },
+    expense_unnecessary: { cls: 'unn', label: 'Gasto innecesario', verb: 'Agregar gasto innecesario' }
+  };
+
+  let nextId = 100;
+  const sample = [
+    ['Sueldo octubre', 'income', 850000],
+    ['Alquiler', 'expense_necessary', -320000],
+    ['Proyecto freelance: landing page', 'income', 180000],
+    ['Supermercado semanal', 'expense_necessary', -96500],
+    ['Zapatillas que estaban en oferta', 'expense_unnecessary', -94000],
+    ['Factura de luz', 'expense_necessary', -27800],
+    ['Delivery del viernes', 'expense_unnecessary', -18900],
+    ['Carga de nafta', 'expense_necessary', -35000],
+    ['Suscripciones de streaming', 'expense_unnecessary', -12400]
+  ];
+  let tx = sample.map(([description, typeAmount, amount], i) => ({ id: i + 1, description, typeAmount, amount }));
+  let filter = 'all';
+  let freshId = null;
+  let lastDeleted = null;
+  let toastTimer;
+
+  /* ---------- vista ---------- */
+  function setView(v) {
+    $('#view-auth').hidden = v !== 'auth';
+    $('#view-dash').hidden = v !== 'dash';
+    document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === v)));
+    store.set('cc-view', v);
+    window.scrollTo(0, 0);
+  }
+  document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+
+  /* ---------- tema ---------- */
+  const themes = ['sistema', 'claro', 'oscuro'];
+  let theme = store.get('cc-theme') || 'sistema';
+  function applyTheme() {
+    const root = document.documentElement;
+    if (theme === 'claro') root.dataset.theme = 'light';
+    else if (theme === 'oscuro') root.dataset.theme = 'dark';
+    else delete root.dataset.theme;
+    $('#theme-label').textContent = theme;
+  }
+  $('#theme-btn').addEventListener('click', () => {
+    theme = themes[(themes.indexOf(theme) + 1) % themes.length];
+    store.set('cc-theme', theme); applyTheme();
+  });
+
+  /* ---------- notas ---------- */
+  function notes(open) {
+    $('#notes').hidden = !open; $('#scrim').hidden = !open;
+    if (open) $('#notes-close').focus(); else $('#notes-btn').focus();
+  }
+  $('#notes-btn').addEventListener('click', () => notes(true));
+  $('#notes-close').addEventListener('click', () => notes(false));
+  $('#scrim').addEventListener('click', () => notes(false));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#notes').hidden) notes(false); });
+
+  /* ---------- auth ---------- */
+  let mode = 'login';
+  function setMode(m) {
+    mode = m;
+    $('#tab-login').setAttribute('aria-selected', String(m === 'login'));
+    $('#tab-register').setAttribute('aria-selected', String(m === 'register'));
+    $('#f-name').hidden = m !== 'register';
+    $('#auth-title').textContent = m === 'login' ? 'Bienvenido de nuevo' : 'Crea tu cuenta';
+    $('#auth-sub').textContent = m === 'login' ? 'Ingresa con tu email para ver tu balance.' : 'Te toma menos de un minuto. No pedimos datos bancarios.';
+    $('#auth-submit').textContent = m === 'login' ? 'Iniciar sesión' : 'Crear cuenta';
+    $('#password').autocomplete = m === 'login' ? 'current-password' : 'new-password';
+    $('#auth-alert').hidden = true;
+    ['name', 'email', 'pass'].forEach(k => setErr(k, ''));
+  }
+  $('#tab-login').addEventListener('click', () => setMode('login'));
+  $('#tab-register').addEventListener('click', () => setMode('register'));
+
+  function setErr(key, msg) {
+    const el = $('#err-' + key);
+    el.textContent = msg;
+    const field = el.closest('.field');
+    if (field) field.classList.toggle('invalid', !!msg);
+    const input = field && field.querySelector('input');
+    if (input) input.setAttribute('aria-invalid', String(!!msg));
+  }
+  const validators = {
+    name: () => $('#name').value.trim() ? '' : 'Escribe tu nombre.',
+    email: () => {
+      const v = $('#email').value.trim();
+      if (!v) return 'Escribe tu email.';
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? '' : 'Revisa el formato, por ejemplo: ana@email.com';
+    },
+    pass: () => {
+      const v = $('#password').value;
+      if (!v) return 'Escribe tu contraseña.';
+      return v.length < 8 ? `Le faltan ${8 - v.length} caracteres (mínimo 8).` : '';
+    }
+  };
+  [['name', '#name'], ['email', '#email'], ['pass', '#password']].forEach(([k, sel]) => {
+    $(sel).addEventListener('blur', () => { if ($(sel).value) setErr(k, validators[k]()); });
+    $(sel).addEventListener('input', () => { if ($('#err-' + k).textContent) setErr(k, validators[k]()); });
+  });
+  $('#toggle-pass').addEventListener('click', () => {
+    const p = $('#password'); const show = p.type === 'password';
+    p.type = show ? 'text' : 'password';
+    $('#toggle-pass').textContent = show ? 'Ocultar' : 'Mostrar';
+  });
+  function submitAuth() {
+    const keys = mode === 'register' ? ['name', 'email', 'pass'] : ['email', 'pass'];
+    let first = null;
+    keys.forEach(k => { const m = validators[k](); setErr(k, m); if (m && !first) first = k; });
+    if (first) { $({ name: '#name', email: '#email', pass: '#password' }[first]).focus(); return; }
+    const btn = $('#auth-submit');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner" aria-hidden="true"></span>' + (mode === 'login' ? 'Ingresando…' : 'Creando cuenta…');
+    setTimeout(() => {
+      btn.disabled = false; setMode(mode);
+      setView('dash');
+    }, 900);
+  }
+  $('#auth-form').addEventListener('submit', e => { e.preventDefault(); submitAuth(); });
+  $('#demo-login').addEventListener('click', () => {
+    setMode('login');
+    $('#email').value = 'demo@cuentasclaras.app';
+    $('#password').value = 'portfolio2026';
+    submitAuth();
+  });
+  $('#logout').addEventListener('click', () => setView('auth'));
+
+  /* ---------- transacciones ---------- */
+  const typeInputs = document.querySelectorAll('input[name="type"]');
+  typeInputs.forEach(r => r.addEventListener('change', () => {
+    $('#tx-submit').textContent = TYPES[r.value].verb;
+    $('#err-type').textContent = ''; $('#types').classList.remove('invalid');
+  }));
+  const txValid = {
+    desc: () => $('#desc').value.trim() ? '' : 'Escribe una descripción corta.',
+    amount: () => {
+      const raw = $('#amount').value.trim().replace(/\./g, '').replace(',', '.');
+      if (!raw) return 'Escribe un monto.';
+      const n = Number(raw);
+      if (!isFinite(n)) return 'Usa solo números, por ejemplo 1500,50';
+      return n > 0 ? '' : 'El monto debe ser mayor a 0.';
+    }
+  };
+  ['desc', 'amount'].forEach(k => $('#' + k).addEventListener('input', () => { if ($('#err-' + k).textContent) setErr(k, txValid[k]()); }));
+  $('#tx-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const typeEl = document.querySelector('input[name="type"]:checked');
+    const errs = { desc: txValid.desc(), amount: txValid.amount() };
+    setErr('desc', errs.desc); setErr('amount', errs.amount);
+    $('#err-type').textContent = typeEl ? '' : 'Elige si es un ingreso o un gasto.';
+    $('#types').classList.toggle('invalid', !typeEl);
+    if (!typeEl) { typeInputs[0].focus(); return; }
+    if (errs.desc) { $('#desc').focus(); return; }
+    if (errs.amount) { $('#amount').focus(); return; }
+    let amount = Number($('#amount').value.trim().replace(/\./g, '').replace(',', '.'));
+    if (typeEl.value !== 'income') amount = -amount;
+    const t = { id: nextId++, description: $('#desc').value.trim(), typeAmount: typeEl.value, amount };
+    tx.unshift(t); freshId = t.id;
+    if (filter !== 'all' && filter !== t.typeAmount) filter = 'all';
+    $('#desc').value = ''; $('#amount').value = '';
+    render();
+    showToast(`${TYPES[t.typeAmount].label} agregado: ${money(Math.abs(amount))}`, false);
+    $('#desc').focus();
+  });
+
+  function remove(id) {
+    const i = tx.findIndex(t => t.id === id);
+    if (i < 0) return;
+    lastDeleted = { t: tx[i], i };
+    tx.splice(i, 1);
+    render();
+    showToast(`Se eliminó "${lastDeleted.t.description}"`, true);
+  }
+  $('#toast-undo').addEventListener('click', () => {
+    if (!lastDeleted) return;
+    tx.splice(lastDeleted.i, 0, lastDeleted.t); freshId = lastDeleted.t.id; lastDeleted = null;
+    render(); $('#toast').hidden = true;
+  });
+  function showToast(msg, undo) {
+    $('#toast-msg').textContent = msg;
+    $('#toast-undo').hidden = !undo;
+    $('#toast').hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { $('#toast').hidden = true; }, undo ? 6000 : 3000);
+  }
+
+  function render() {
+    const sum = (f) => tx.filter(f).reduce((a, t) => a + t.amount, 0);
+    const income = sum(t => t.amount > 0);
+    const nec = -sum(t => t.typeAmount === 'expense_necessary');
+    const unn = -sum(t => t.typeAmount === 'expense_unnecessary');
+    const expense = nec + unn;
+    const balance = income - expense;
+
+    $('#balance').textContent = money(balance);
+    $('#balance').classList.toggle('neg', balance < 0);
+    $('#income').textContent = money(income);
+    $('#expense').textContent = money(expense);
+    const pn = expense ? Math.round(nec / expense * 100) : 0;
+    const pu = expense ? 100 - pn : 0;
+    $('#bar-nec').style.width = pn + '%';
+    $('#bar-unn').style.width = pu + '%';
+    $('#split-bar').setAttribute('aria-label', `Necesarios ${pn}%, innecesarios ${pu}%`);
+    $('#pct-nec').textContent = pn + '%'; $('#pct-unn').textContent = pu + '%';
+    $('#amt-nec').textContent = money(nec); $('#amt-unn').textContent = money(unn);
+    $('#insight').innerHTML = !expense
+      ? 'Todavía no registraste gastos. Cuando lo hagas, verás aquí cuánto podrías ahorrar.'
+      : unn === 0
+        ? '<strong>Ningún gasto innecesario.</strong> Todo lo que gastaste fue esencial.'
+        : `Si evitaras los gastos innecesarios, tu saldo sería <strong>${money(balance + unn)}</strong>.`;
+
+    const counts = { all: tx.length, income: 0, expense_necessary: 0, expense_unnecessary: 0 };
+    tx.forEach(t => counts[t.typeAmount]++);
+    const fl = [['all', 'Todas'], ['income', 'Ingresos'], ['expense_necessary', 'Necesarios'], ['expense_unnecessary', 'Innecesarios']];
+    $('#filters').innerHTML = fl.map(([k, l]) =>
+      `<button type="button" data-f="${k}" aria-pressed="${filter === k}">${k !== 'all' ? `<span class="dot ${TYPES[k].cls}"></span>` : ''}${l} <span class="n">${counts[k]}</span></button>`).join('');
+    $('#filters').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { filter = b.dataset.f; render(); }));
+
+    const shown = tx.filter(t => filter === 'all' || t.typeAmount === filter);
+    $('#count').textContent = `${shown.length} de ${tx.length}`;
+    const list = $('#list');
+    list.innerHTML = '';
+    if (!shown.length) {
+      list.innerHTML = tx.length
+        ? '<li class="empty"><strong>Nada por aquí</strong><span>No hay transacciones de este tipo.</span></li>'
+        : '<li class="empty"><strong>Tu historial está vacío</strong><span>Agrega tu primer ingreso o gasto con el formulario.</span></li>';
+    }
+    shown.forEach(t => {
+      const ty = TYPES[t.typeAmount];
+      const li = document.createElement('li');
+      li.className = 'item' + (t.id === freshId ? ' fresh' : '');
+      li.innerHTML = `<span class="ico ${ty.cls}" aria-hidden="true">${ICONS[ty.cls]}</span>
+        <div class="desc"><div class="t"></div><div class="s">${ty.label}</div></div>
+        <span class="amt ${t.amount > 0 ? 'inc' : ''}">${t.amount > 0 ? '+' : '−'} ${money(Math.abs(t.amount))}</span>
+        <button type="button" class="del">${ICONS.del}</button>`;
+      li.querySelector('.t').textContent = t.description;
+      li.querySelector('.t').title = t.description;
+      const del = li.querySelector('.del');
+      del.setAttribute('aria-label', `Eliminar ${t.description}`);
+      del.title = 'Eliminar';
+      del.addEventListener('click', () => remove(t.id));
+      list.appendChild(li);
+    });
+    freshId = null;
+  }
+
+  applyTheme();
+  setView(store.get('cc-view') === 'auth' ? 'auth' : 'dash');
+  render();
+})();
+</script>
