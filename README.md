@@ -1,6 +1,6 @@
 # Cuentas Claras
 
-Gestor de gastos personales que te ayuda a ver a dónde se va tu plata: separa el **gasto necesario** (alquiler, supermercado, luz) del **gasto innecesario** (delivery, suscripciones, compras impulsivas) y te muestra cuánto tendrías si evitaras los segundos.
+Gestor de gastos personales que te ayuda a ver a dónde se va tu dinero: separa el **gasto necesario** (alquiler, supermercado, luz) del **gasto innecesario** (delivery, suscripciones, compras impulsivas) y te muestra cuánto tendrías si evitaras los segundos.
 
 ![Panel en modo claro](docs/screenshots/panel-light.png)
 
@@ -40,11 +40,11 @@ Gestor de gastos personales que te ayuda a ver a dónde se va tu plata: separa e
    npm start
    ```
 
-   Abrí `http://localhost:4200`.
+   Abre `http://localhost:4200`.
 
 ## Cuenta demo
 
-Usá el botón **Entrar con la cuenta demo** o ingresá con:
+Usa el botón **Entrar con la cuenta demo** o ingresa con:
 
 - Email: `demo@cuentasclaras.app`
 - Contraseña: `portfolio2026`
@@ -56,9 +56,13 @@ Los montos viajan y se guardan como **enteros en centavos** (`$ 10,50` se envía
 ## Tests
 
 ```bash
+# Frontend (CHROME_BIN es opcional: úsalo si Chrome no está en el PATH)
 CHROME_BIN=/usr/bin/google-chrome npx ng test --watch=false --browsers=ChromeHeadless
+
+# Backend (en ../nest-expense-manager)
+npx jest
 ```
 
 ## Diseño
 
-La maqueta de referencia del rediseño está en [`docs/design/cuentas-claras-demo.html`](docs/design/cuentas-claras-demo.html) (abrila en el navegador).
+La maqueta de referencia del rediseño está en [`docs/design/cuentas-claras-demo.html`](docs/design/cuentas-claras-demo.html) (ábrela en el navegador).
