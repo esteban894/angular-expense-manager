@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
+import { ThemeMode, ThemeService } from 'src/app/services/theme.service';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
@@ -14,8 +15,17 @@ export class NavbarComponent implements OnInit {
   constructor(
     private router: Router,
     private authService: AuthService,
-    private userService: UserService
+    private userService: UserService,
+    public theme: ThemeService
   ) {}
+
+  get initials(): string {
+    return (this.userEmail ?? '').split('@')[0].slice(0, 2).toUpperCase();
+  }
+
+  modeLabel(mode: ThemeMode | null): string {
+    return mode === 'light' ? 'claro' : mode === 'dark' ? 'oscuro' : 'sistema';
+  }
 
   ngOnInit(): void {
     this.router.events.subscribe((event) => {
