@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { RegisterDto, ResponseLogin } from '../models/auth.model';
 import { environment } from 'src/environments/environment';
-import { catchError, switchMap, tap } from 'rxjs';
+import { switchMap, tap } from 'rxjs';
 import { TokenService } from './token.service';
 import { Router } from '@angular/router';
 import { UserService } from './user.service';
@@ -28,9 +28,6 @@ export class AuthService {
         password,
       })
       .pipe(
-        catchError((err) => {
-          throw err;
-        }),
         tap((response) => {
           this.tokenService.saveToken(response.token);
           this.userService.saveEmail(response.email);
