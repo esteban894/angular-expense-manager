@@ -31,6 +31,8 @@ export class TransactionFiltersComponent implements OnInit, OnDestroy {
   rangeError = false;
 
   private current: TransactionFilters = {};
+  /** true mientras este componente emite filtros, para distinguirlos de cambios externos. */
+  private ownChange = false;
   private searchReset$ = new Subject<void>();
   private destroy$ = new Subject<void>();
 
@@ -47,6 +49,13 @@ export class TransactionFiltersComponent implements OnInit, OnDestroy {
         this.search.setValue(f.search ?? '', { emitEvent: false });
         this.from.setValue(f.from ?? '', { emitEvent: false });
         this.to.setValue(f.to ?? '', { emitEvent: false });
+        return;
+      }
+      // Cambios propios: los inputs ya muestran lo que tipeó el usuario.
+      if (this.ownChange) return;
+      if (!(f.type || f.search || f.from || f.to)) {
+        // Borrado externo total (p. ej. "Limpiar filtros" del historial): incluye un rango inválido.
+        this.resetInputs();
         return;
       }
       // Solo se sincroniza ante un borrado externo (clave pasó de valor a vacía),
@@ -71,7 +80,7 @@ export class TransactionFiltersComponent implements OnInit, OnDestroy {
         filter((v) => v !== (this.current.search ?? '')),
         takeUntil(this.destroy$)
       )
-      .subscribe((v) => this.transactionService.setFilters({ search: v || undefined }));
+      .subscribe((v) => this.apply({ search: v || undefined }));
 
     merge(this.from.valueChanges, this.to.valueChanges)
       .pipe(takeUntil(this.destroy$))
@@ -79,8 +88,13 @@ export class TransactionFiltersComponent implements OnInit, OnDestroy {
         const from = this.from.value;
         const to = this.to.value;
         this.rangeError = !!from && !!to && from > to;
-        if (this.rangeError) return;
-        this.transactionService.setFilters({ from: from || undefined, to: to || undefined });
+        // Con rango inválido se quita el rango del servicio para no listar uno viejo;
+        // los inputs conservan lo que el usuario escribió.
+        this.apply(
+          this.rangeError
+            ? { from: undefined, to: undefined }
+            : { from: from || undefined, to: to || undefined }
+        );
       });
   }
 
@@ -90,7 +104,7 @@ export class TransactionFiltersComponent implements OnInit, OnDestroy {
   }
 
   select(type: TypeAmount | undefined): void {
-    this.transactionService.setFilters({ type });
+    this.apply({ type });
   }
 
   hasFilters(f: TransactionFilters): boolean {
@@ -102,11 +116,29 @@ export class TransactionFiltersComponent implements OnInit, OnDestroy {
   }
 
   clear(): void {
+    this.resetInputs();
+    this.ownChange = true;
+    try {
+      this.transactionService.clearFilters();
+    } finally {
+      this.ownChange = false;
+    }
+  }
+
+  private apply(patch: Partial<TransactionFilters>): void {
+    this.ownChange = true;
+    try {
+      this.transactionService.setFilters(patch);
+    } finally {
+      this.ownChange = false;
+    }
+  }
+
+  private resetInputs(): void {
     this.rangeError = false;
     this.searchReset$.next();
     this.search.setValue('', { emitEvent: false });
     this.from.setValue('', { emitEvent: false });
     this.to.setValue('', { emitEvent: false });
-    this.transactionService.clearFilters();
   }
 }

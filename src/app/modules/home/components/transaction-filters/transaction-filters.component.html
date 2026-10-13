@@ -27,6 +27,7 @@
         id="filter-search"
         type="search"
         [formControl]="search"
+        maxlength="80"
         placeholder="Buscar por descripción"
         class="w-full rounded-[10px] border border-line bg-surface-2 px-3 py-2 text-sm text-fg"
       />
@@ -39,6 +40,7 @@
         [formControl]="from"
         [max]="to.value && to.value < today ? to.value : today"
         [attr.aria-invalid]="rangeError"
+        [attr.aria-describedby]="rangeError ? 'filter-range-error' : null"
         class="w-full rounded-[10px] border border-line bg-surface-2 px-3 py-2 text-sm text-fg"
       />
     </div>
@@ -50,12 +52,13 @@
         [formControl]="to"
         [max]="today"
         [attr.aria-invalid]="rangeError"
+        [attr.aria-describedby]="rangeError ? 'filter-range-error' : null"
         class="w-full rounded-[10px] border border-line bg-surface-2 px-3 py-2 text-sm text-fg"
       />
     </div>
   </div>
 
-  <p *ngIf="rangeError" role="alert" class="text-sm text-unn">
+  <p *ngIf="rangeError" id="filter-range-error" role="alert" class="text-sm text-unn">
     La fecha desde no puede ser posterior a hasta
   </p>
 

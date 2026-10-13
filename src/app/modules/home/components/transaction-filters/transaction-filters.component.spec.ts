@@ -106,14 +106,50 @@ describe('TransactionFiltersComponent', () => {
     expect(service.setFilters).toHaveBeenCalledOnceWith({ search: undefined });
   }));
 
-  it('from > to muestra error y no llama setFilters', () => {
+  it('from > to muestra error, quita el rango del servicio y conserva lo tipeado', () => {
     setup();
     type('#filter-from', '2026-10-10');
     type('#filter-to', '2026-10-01');
     fixture.detectChanges();
     expect(el().textContent).toContain('La fecha desde no puede ser posterior a hasta');
-    expect(service.setFilters).toHaveBeenCalledTimes(1); // solo la primera (desde válido)
     expect(service.setFilters).not.toHaveBeenCalledWith(jasmine.objectContaining({ to: '2026-10-01' }));
+    expect(service.setFilters.calls.mostRecent().args[0]).toEqual({ from: undefined, to: undefined });
+    expect((el().querySelector('#filter-from') as HTMLInputElement).value).toBe('2026-10-10');
+    expect((el().querySelector('#filter-to') as HTMLInputElement).value).toBe('2026-10-01');
+  });
+
+  it('el error de rango se asocia a ambos inputs con aria-describedby', () => {
+    setup();
+    const from = () => el().querySelector('#filter-from')!;
+    const to = () => el().querySelector('#filter-to')!;
+    expect(from().getAttribute('aria-describedby')).toBeNull();
+    type('#filter-from', '2026-10-10');
+    type('#filter-to', '2026-10-01');
+    fixture.detectChanges();
+    const msg = el().querySelector('[role=alert]')!;
+    expect(msg.id).toBe('filter-range-error');
+    expect(from().getAttribute('aria-describedby')).toBe('filter-range-error');
+    expect(to().getAttribute('aria-describedby')).toBe('filter-range-error');
+    type('#filter-to', '2026-10-12');
+    fixture.detectChanges();
+    expect(from().getAttribute('aria-describedby')).toBeNull();
+    expect(service.setFilters).toHaveBeenCalledWith({ from: '2026-10-10', to: '2026-10-12' });
+  });
+
+  it('un borrado externo total limpia también un rango inválido', () => {
+    setup({ search: 'luz' });
+    type('#filter-from', '2026-10-10');
+    type('#filter-to', '2026-10-01');
+    filters$.next({});
+    fixture.detectChanges();
+    expect((el().querySelector('#filter-from') as HTMLInputElement).value).toBe('');
+    expect((el().querySelector('#filter-to') as HTMLInputElement).value).toBe('');
+    expect(el().textContent).not.toContain('La fecha desde no puede ser posterior a hasta');
+  });
+
+  it('búsqueda limitada a 80 caracteres', () => {
+    setup();
+    expect(el().querySelector('#filter-search')!.getAttribute('maxlength')).toBe('80');
   });
 
   it('rango válido llama setFilters', () => {
