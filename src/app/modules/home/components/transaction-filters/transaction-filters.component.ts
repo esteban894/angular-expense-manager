@@ -37,9 +37,18 @@ export class TransactionFiltersComponent implements OnInit, OnDestroy {
   constructor(private transactionService: TransactionService) {}
 
   ngOnInit(): void {
+    let first = true;
     this.filters$.pipe(takeUntil(this.destroy$)).subscribe((f) => {
       const prev = this.current;
       this.current = f;
+      if (first) {
+        // Al volver a montar el componente, los inputs reflejan los filtros vigentes.
+        first = false;
+        this.search.setValue(f.search ?? '', { emitEvent: false });
+        this.from.setValue(f.from ?? '', { emitEvent: false });
+        this.to.setValue(f.to ?? '', { emitEvent: false });
+        return;
+      }
       // Solo se sincroniza ante un borrado externo (clave pasó de valor a vacía),
       // para no pisar texto tipeado que todavía no se aplicó.
       if (prev.search && !f.search && this.search.value !== '') {

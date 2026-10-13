@@ -144,4 +144,13 @@ describe('TransactionFiltersComponent', () => {
     find()!.click();
     expect(service.clearFilters).toHaveBeenCalled();
   });
+
+  it('al iniciar rellena búsqueda y fechas con los filtros vigentes sin re-emitir', fakeAsync(() => {
+    setup({ search: 'luz', from: '2026-10-01', to: '2026-10-10' });
+    expect((el().querySelector('input[type=search]') as HTMLInputElement).value).toBe('luz');
+    expect((el().querySelector('#filter-from') as HTMLInputElement).value).toBe('2026-10-01');
+    expect((el().querySelector('#filter-to') as HTMLInputElement).value).toBe('2026-10-10');
+    tick(500);
+    expect(service.setFilters).not.toHaveBeenCalled();
+  }));
 });
