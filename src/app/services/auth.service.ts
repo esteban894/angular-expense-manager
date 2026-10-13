@@ -6,6 +6,8 @@ import { switchMap, tap } from 'rxjs';
 import { TokenService } from './token.service';
 import { Router } from '@angular/router';
 import { UserService } from './user.service';
+import { TransactionService } from './transaction.service';
+import { ToastService } from './toast.service';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +18,9 @@ export class AuthService {
     private http: HttpClient,
     private router: Router,
     private tokenService: TokenService,
-    private userService: UserService
+    private userService: UserService,
+    private transactionService: TransactionService,
+    private toast: ToastService
   ) {
     this.url = environment.url;
   }
@@ -56,6 +60,9 @@ export class AuthService {
   logout() {
     this.tokenService.removeToken();
     this.userService.removeEmail();
+    // Estado de la sesión anterior que no debe verse en la siguiente.
+    this.transactionService.clearFilters();
+    this.toast.dismiss();
     this.router.navigate(['/']);
   }
 }
