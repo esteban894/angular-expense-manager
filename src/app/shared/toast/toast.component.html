@@ -1,17 +1,17 @@
-<div
-  *ngIf="toast$ | async as t"
-  role="status"
-  aria-live="polite"
-  class="fixed left-1/2 z-20 flex max-w-[calc(100%-32px)] -translate-x-1/2 items-center gap-3.5 rounded-xl bg-fg py-2.5 pl-4 pr-2.5 text-sm text-bg shadow-lg"
-  style="bottom: calc(20px + env(safe-area-inset-bottom, 0px))"
->
-  <span>{{ t.message }}</span>
-  <button
-    *ngIf="t.action"
-    type="button"
-    (click)="run(t)"
-    class="rounded px-1.5 py-1 font-semibold underline underline-offset-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-bg"
+<div role="status" aria-live="polite" aria-atomic="true">
+  <div
+    *ngIf="toast$ | async as t"
+    class="fixed left-1/2 z-20 flex max-w-[calc(100%-32px)] -translate-x-1/2 items-center gap-3.5 rounded-xl bg-fg py-2.5 pl-4 pr-2.5 text-sm text-bg shadow-lg"
+    style="bottom: calc(20px + env(safe-area-inset-bottom, 0px))"
   >
-    {{ t.action.label }}
-  </button>
+    <span>{{ t.message }}</span>
+    <button
+      *ngIf="t.action"
+      type="button"
+      (click)="run(t)"
+      class="rounded px-1.5 py-1 font-semibold underline underline-offset-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-bg"
+    >
+      {{ t.action.label }}
+    </button>
+  </div>
 </div>

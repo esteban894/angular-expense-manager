@@ -16,8 +16,14 @@ describe('ToastComponent', () => {
 
   afterEach(() => service.dismiss());
 
-  it('no renderiza nada sin toast', () => {
-    expect(el().querySelector('[role=status]')).toBeNull();
+  it('la región live existe antes de mostrar un toast', () => {
+    const s = el().querySelector('[role=status]')!;
+    expect(s).not.toBeNull();
+    expect(s.getAttribute('aria-live')).toBe('polite');
+  });
+
+  it('no renderiza contenido sin toast', () => {
+    expect(el().querySelector('[role=status]')!.textContent!.trim()).toBe('');
   });
 
   it('muestra el mensaje con role=status', () => {
@@ -36,6 +42,14 @@ describe('ToastComponent', () => {
     (el().querySelector('button') as HTMLButtonElement).click();
     fixture.detectChanges();
     expect(run).toHaveBeenCalled();
-    expect(el().querySelector('[role=status]')).toBeNull();
+    expect(el().querySelector('[role=status]')!.textContent!.trim()).toBe('');
+  });
+
+  it('un toast mostrado por la acción no se descarta', () => {
+    service.show('Uno', { label: 'Ok', run: () => service.show('Dos') });
+    fixture.detectChanges();
+    (el().querySelector('button') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(el().querySelector('[role=status]')!.textContent).toContain('Dos');
   });
 });

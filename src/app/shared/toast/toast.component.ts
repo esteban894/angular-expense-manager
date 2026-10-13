@@ -11,7 +11,7 @@ export class ToastComponent {
   constructor(private toastService: ToastService) {}
 
   run(t: Toast): void {
-    t.action?.run();
     this.toastService.dismiss();
+    t.action?.run();
   }
 }
