@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BehaviorSubject, of, throwError } from 'rxjs';
+import { BehaviorSubject, NEVER, of, throwError } from 'rxjs';
 import { ToastService } from 'src/app/services/toast.service';
 import { Transaction, TransactionFilters, TypeAmount } from 'src/app/models/transaction.model';
 import { TransactionService } from 'src/app/services/transaction.service';
@@ -26,9 +26,9 @@ describe('TransactionListComponent', () => {
   const btn = (label: string) =>
     Array.from(el().querySelectorAll('button')).find((b) => b.textContent!.includes(label)) as HTMLButtonElement;
 
-  function setup(o: { list?: Transaction[]; loading?: boolean; error?: string | null; filters?: TransactionFilters } = {}) {
+  function setup(o: { list?: Transaction[] | null; loading?: boolean; error?: string | null; filters?: TransactionFilters } = {}) {
     service = {
-      transactions$: of(o.list ?? []),
+      transactions$: o.list === null ? NEVER : of(o.list ?? []),
       loading$: new BehaviorSubject(o.loading ?? false),
       error$: new BehaviorSubject(o.error ?? null),
       filters$: new BehaviorSubject(o.filters ?? {}),
@@ -49,9 +49,21 @@ describe('TransactionListComponent', () => {
     fixture.detectChanges();
   }
 
-  it('loading muestra 4 filas skeleton', () => {
-    setup({ loading: true });
+  it('primera carga (sin lista aún) muestra 4 filas skeleton', () => {
+    setup({ list: null, loading: true });
     expect(el().querySelectorAll('[data-testid=skeleton]').length).toBe(4);
+  });
+
+  it('al refrescar mantiene la lista visible con aria-busy en vez del skeleton', () => {
+    setup({ list: [tx(1), tx(2)], loading: true });
+    expect(el().querySelectorAll('[data-testid=skeleton]').length).toBe(0);
+    expect(el().querySelectorAll('app-transaction-item').length).toBe(2);
+    expect(el().querySelector('ul')!.getAttribute('aria-busy')).toBe('true');
+  });
+
+  it('sin carga en curso la lista no queda aria-busy', () => {
+    setup({ list: [tx(1)] });
+    expect(el().querySelector('ul')!.getAttribute('aria-busy')).toBe('false');
   });
 
   it('vacía sin filtros', () => {
@@ -115,5 +127,38 @@ describe('TransactionListComponent', () => {
     service.remove.and.returnValue(throwError(() => new Error('x')));
     del();
     expect(toast.show).toHaveBeenCalledWith('No pudimos eliminar la transacción. Intenta de nuevo.');
+  });
+
+  describe('foco tras eliminar', () => {
+    const deleteBtn = (id: number) =>
+      el().querySelector(`app-transaction-item[data-id="${id}"] button`) as HTMLButtonElement;
+
+    it('pasa al botón eliminar del siguiente ítem', () => {
+      setup({ list: [tx(1), tx(2), tx(3)] });
+      deleteBtn(2).click();
+      expect(document.activeElement).toBe(deleteBtn(3));
+    });
+
+    it('si era el último, pasa al anterior', () => {
+      setup({ list: [tx(1), tx(2), tx(3)] });
+      deleteBtn(3).click();
+      expect(document.activeElement).toBe(deleteBtn(2));
+    });
+
+    it('si la lista queda vacía, pasa al título Historial', () => {
+      setup({ list: [tx(1)] });
+      deleteBtn(1).click();
+      const h = el().querySelector('h2')!;
+      expect(h.getAttribute('tabindex')).toBe('-1');
+      expect(document.activeElement).toBe(h);
+    });
+
+    it('si falla el borrado no mueve el foco', () => {
+      setup({ list: [tx(1), tx(2)] });
+      service.remove.and.returnValue(throwError(() => new Error('x')));
+      deleteBtn(1).focus();
+      deleteBtn(1).click();
+      expect(document.activeElement).toBe(deleteBtn(1));
+    });
   });
 });

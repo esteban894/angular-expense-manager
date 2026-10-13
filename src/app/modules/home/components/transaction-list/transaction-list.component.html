@@ -3,7 +3,7 @@
   *ngIf="{ list: transactions$ | async, loading: loading$ | async, error: error$ | async, f: filters$ | async } as vm"
 >
   <div class="flex items-center justify-between gap-2">
-    <h2 class="font-display text-lg font-bold text-fg">Historial</h2>
+    <h2 #heading tabindex="-1" class="font-display text-lg font-bold text-fg focus:outline-none">Historial</h2>
     <span *ngIf="!vm.loading && vm.list" class="text-sm text-muted" aria-live="polite">
       {{ vm.list.length }} {{ vm.list.length === 1 ? 'resultado' : 'resultados' }}
     </span>
@@ -20,7 +20,7 @@
     <button type="button" (click)="retry()" class="font-medium underline">Reintentar</button>
   </div>
 
-  <ul *ngIf="vm.loading" class="-mx-2 grid" aria-busy="true" aria-label="Cargando historial">
+  <ul *ngIf="vm.loading && !vm.list" class="-mx-2 grid" aria-busy="true" aria-label="Cargando historial">
     <li
       *ngFor="let s of skeletons"
       data-testid="skeleton"
@@ -36,13 +36,16 @@
   </ul>
 
   <ul
-    *ngIf="!vm.loading && vm.list?.length"
-    class="-mx-2 grid max-h-[520px] overflow-y-auto divide-y divide-line"
+    *ngIf="vm.list?.length"
+    [attr.aria-busy]="!!vm.loading"
+    class="-mx-2 grid max-h-[520px] overflow-y-auto divide-y divide-line transition-opacity"
+    [class.opacity-60]="vm.loading"
   >
     <app-transaction-item
       *ngFor="let t of vm.list; trackBy: trackById"
+      [attr.data-id]="t.id"
       [transaction]="t"
-      (delete)="onDelete($event)"
+      (delete)="onDelete($event, vm.list!)"
     ></app-transaction-item>
   </ul>
 
