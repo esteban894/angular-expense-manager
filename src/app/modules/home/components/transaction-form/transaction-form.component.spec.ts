@@ -124,18 +124,30 @@ describe('TransactionFormComponent', () => {
     expect(btn.disabled).toBeTrue();
   });
 
-  it('error de la API se muestra en .form-alert', () => {
-    setup(throwError(() => new HttpErrorResponse({ status: 400, error: { message: ['Monto inválido'] } })));
+  const apiError = (status: number, message?: unknown) =>
+    throwError(() => new HttpErrorResponse({ status, error: message === undefined ? null : { message } }));
+
+  it('400 muestra "Revisa los datos" en .form-alert sin texto crudo del backend', () => {
+    setup(apiError(400, ['amount must not be greater than 2000000000']));
     fill('#t-nec', 'Luz', '10');
     submit();
-    expect(q('.form-alert')!.textContent).toContain('Monto inválido');
+    expect(q('.form-alert')!.textContent).toContain('Revisa los datos ingresados.');
+    expect(q('.form-alert')!.textContent).not.toContain('amount must');
     expect(q('.form-alert')!.getAttribute('role')).toBe('alert');
   });
 
-  it('error sin mensaje usa el fallback', () => {
-    setup(throwError(() => new HttpErrorResponse({ status: 500 })));
+  it('401 avisa que la sesión expiró', () => {
+    setup(apiError(401, 'Unauthorized'));
+    fill('#t-nec', 'Luz', '10');
+    submit();
+    expect(q('.form-alert')!.textContent).toContain('Tu sesión expiró. Vuelve a iniciar sesión.');
+  });
+
+  it('otros errores usan el fallback', () => {
+    setup(apiError(500, 'Internal server error'));
     fill('#t-nec', 'Luz', '10');
     submit();
     expect(q('.form-alert')!.textContent).toContain('No pudimos guardar la transacción. Intenta de nuevo.');
+    expect(q('.form-alert')!.textContent).not.toContain('Internal');
   });
 });

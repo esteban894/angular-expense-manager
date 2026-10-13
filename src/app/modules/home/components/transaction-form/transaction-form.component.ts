@@ -142,8 +142,9 @@ export class TransactionFormComponent {
   }
 
   private messageFrom(err: HttpErrorResponse): string {
-    const m = err?.error?.message;
-    const text = Array.isArray(m) ? m[0] : m;
-    return typeof text === 'string' && text ? text : FALLBACK_ERROR;
+    // Nunca se muestra el texto crudo del backend (en inglés y técnico).
+    if (err?.status === 401) return 'Tu sesión expiró. Vuelve a iniciar sesión.';
+    if (err?.status === 400) return 'Revisa los datos ingresados.';
+    return FALLBACK_ERROR;
   }
 }
