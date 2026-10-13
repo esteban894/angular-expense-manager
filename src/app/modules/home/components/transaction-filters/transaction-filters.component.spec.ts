@@ -77,6 +77,28 @@ describe('TransactionFiltersComponent', () => {
     expect(service.setFilters).toHaveBeenCalledTimes(1);
   }));
 
+  it('un chip no pisa la búsqueda pendiente', fakeAsync(() => {
+    setup();
+    type('input[type=search]', 'abc');
+    tick(100);
+    chip('Ingresos').click();
+    fixture.detectChanges();
+    expect((el().querySelector('input[type=search]') as HTMLInputElement).value).toBe('abc');
+    tick(300);
+    expect(service.setFilters).toHaveBeenCalledWith({ search: 'abc' });
+  }));
+
+  it('borrado externo vacía el input y cancela búsqueda pendiente', fakeAsync(() => {
+    setup({ search: 'abc' });
+    type('input[type=search]', 'abcd');
+    tick(100);
+    filters$.next({});
+    fixture.detectChanges();
+    expect((el().querySelector('input[type=search]') as HTMLInputElement).value).toBe('');
+    tick(500);
+    expect(service.setFilters).not.toHaveBeenCalled();
+  }));
+
   it('búsqueda vacía envía undefined', fakeAsync(() => {
     setup({ search: 'sup' });
     type('input[type=search]', '');

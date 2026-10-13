@@ -14,7 +14,6 @@ function todayKey(): string {
   templateUrl: './transaction-filters.component.html',
 })
 export class TransactionFiltersComponent implements OnInit, OnDestroy {
-  readonly TypeAmount = TypeAmount;
   readonly today = todayKey();
   readonly chips: { label: string; type: TypeAmount | undefined; dot: string }[] = [
     { label: 'Todas', type: undefined, dot: '' },
@@ -32,24 +31,33 @@ export class TransactionFiltersComponent implements OnInit, OnDestroy {
   rangeError = false;
 
   private current: TransactionFilters = {};
+  private searchReset$ = new Subject<void>();
   private destroy$ = new Subject<void>();
 
   constructor(private transactionService: TransactionService) {}
 
   ngOnInit(): void {
     this.filters$.pipe(takeUntil(this.destroy$)).subscribe((f) => {
+      const prev = this.current;
       this.current = f;
-      // Reset externo (p. ej. "Limpiar filtros" del estado vacío).
-      if (!f.search && !f.from && !f.to && !this.rangeError) {
+      // Solo se sincroniza ante un borrado externo (clave pasó de valor a vacía),
+      // para no pisar texto tipeado que todavía no se aplicó.
+      if (prev.search && !f.search && this.search.value !== '') {
         this.search.setValue('', { emitEvent: false });
-        this.from.setValue('', { emitEvent: false });
-        this.to.setValue('', { emitEvent: false });
+        this.searchReset$.next();
       }
+      if (prev.from && !f.from) this.from.setValue('', { emitEvent: false });
+      if (prev.to && !f.to) this.to.setValue('', { emitEvent: false });
+      if (!this.from.value || !this.to.value) this.rangeError = false;
     });
 
-    this.search.valueChanges
+    merge(
+      this.search.valueChanges,
+      this.searchReset$.pipe(map(() => null))
+    )
       .pipe(
         debounceTime(300),
+        filter((v): v is string => v !== null),
         map((v) => v.trim()),
         filter((v) => v !== (this.current.search ?? '')),
         takeUntil(this.destroy$)
@@ -86,6 +94,7 @@ export class TransactionFiltersComponent implements OnInit, OnDestroy {
 
   clear(): void {
     this.rangeError = false;
+    this.searchReset$.next();
     this.search.setValue('', { emitEvent: false });
     this.from.setValue('', { emitEvent: false });
     this.to.setValue('', { emitEvent: false });

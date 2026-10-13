@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BehaviorSubject } from 'rxjs';
-import { of } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { Transaction, TransactionFilters, TypeAmount } from 'src/app/models/transaction.model';
 import { TransactionService } from 'src/app/services/transaction.service';
 import { TransactionListComponent } from './transaction-list.component';
